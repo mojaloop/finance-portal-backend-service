@@ -1,0 +1,58 @@
+[
+  {
+    "id": 11,
+    "accounts": [
+      {
+        "id": 3,
+        "state": "PS_TRANSFERS_COMMITTED",
+        "reason": "Transfers committed for payer & payee",
+        "netSettlementAmount": {
+          "amount": 1,
+          "currency": "XOF"
+        }
+      }
+    ]
+  },
+  {
+    "id": 15,
+    "accounts": [
+      {
+        "id": 5,
+        "state": "PS_TRANSFERS_COMMITTED",
+        "reason": "Transfers committed for payer & payee",
+        "netSettlementAmount": {
+          "amount": -1,
+          "currency": "XOF"
+        }
+      }
+    ]
+  },
+  {
+    "id": 640,
+    "accounts": [
+      {
+        "id": 33,
+        "state": "PS_TRANSFERS_COMMITTED",
+        "reason": "Transfers committed for payer & payee",
+        "netSettlementAmount": {
+          "amount": 80,
+          "currency": "XOF"
+        }
+      }
+    ]
+  },
+  {
+    "id": 641,
+    "accounts": [
+      {
+        "id": 35,
+        "state": "PS_TRANSFERS_COMMITTED",
+        "reason": "Transfers committed for payer & payee",
+        "netSettlementAmount": {
+          "amount": -80,
+          "currency": "XOF"
+        }
+      }
+    ]
+  }
+]

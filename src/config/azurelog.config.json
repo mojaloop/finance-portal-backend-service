@@ -1,0 +1,34 @@
+{
+    "TENANT_ID": "REPLACEME",
+    "CLIENT_ID": "REPLACEME",
+    "CLIENT_SECRET": "REPLACEME",
+    "REDIRECT_URI": "http://localhost:5000",
+    "RESOURCE": "https://api.loganalytics.io/",
+    "AUTH_TOKEN_ENDPOINT": "https://login.microsoftonline.com",
+    "WORKSPACE_ID": "REPLACEME",
+    "LOG_API_ENDPOINT": "https://api.loganalytics.io/v1/",
+    "SEARCH_QUERY_TEMPLATE": {
+        "TEMPLATE": "search '{{transferId}}' | where LogEntry matches regex '.*Producer.sendMessage::messageProtocol:.*' | where LogEntry matches regex '.*transferId.*' | where LogEntry matches regex '.*fspiop-signature.*' | take 1 | project LogEntry",
+        "REGEX": "search '(.*)' | where LogEntry matches regex '.*Producer.sendMessage::messageProtocol:.*' | where LogEntry matches regex '.*transferId.*' | where LogEntry matches regex '.*fspiop-signature.*' | take 1 | project LogEntry"
+    },
+    "KAFKA_MESSAGE_PATTERN": "Producer.sendMessage::messageProtocol:'({.*?})'",
+    "CLEAN_MESSAGE_REPLACE_PATTERNS": [
+        {
+            "PATTERN": "\\\\\"",
+            "ATTRIBUTES": "g",
+            "REPLACE": "\""
+        },
+        {
+            "PATTERN": "\\\\\\\\\"",
+            "ATTRIBUTES": "g",
+            "REPLACE": "\\\""
+        }
+    ],
+    "CLEAN_SIGNATURE_REPLACE_PATTERNS": [
+        {
+            "PATTERN": "\\\\\\\\\"",
+            "ATTRIBUTES": "g",
+            "REPLACE": "\""
+        }
+    ]
+}

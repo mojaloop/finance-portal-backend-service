@@ -1,0 +1,50 @@
+{
+  "name": "@mojaloop/finance-portal-backend-service",
+  "version": "0.0.1-snapshot",
+  "description": "The backend service to support the finance portal web ui. Essentially a thin wrapper around SQL queries",
+  "license": "Apache-2.0",
+  "contributors": [
+    "Matt Kingston, ModusBox Inc."
+  ],
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:mojaloop/finance-portal-backend-service.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mojaloop/finance-portal-backend-service/issues"
+  },
+  "homepage": "https://github.com/mojaloop/finance-portal-backend-service#readme",
+  "dependencies": {
+    "axios": "0.18.0",
+    "base64url": "3.0.1",
+    "big.js": "5.2.2",
+    "@mojaloop/finance-portal-lib": "0.0.1-snapshot",
+    "dotenv": "6.2.0",
+    "glob": "7.1.4",
+    "json-2-csv": "3.5.3",
+    "jsonwebtoken": "8.5.1",
+    "koa": "2.7.0",
+    "koa-body": "4.1.0",
+    "koa-router": "7.4.0",
+    "koa-send": "5.0.0",
+    "mustache": "3.0.1",
+    "mysql2": "1.6.5",
+    "node-fetch": "2.6.0",
+    "qs": "6.7.0",
+    "rc": "1.2.8"
+  },
+  "devDependencies": {
+    "eslint": "5.3.0",
+    "eslint-config-airbnb-base": "13.1.0",
+    "eslint-plugin-import": "2.17.2",
+    "jest": "24.8.0",
+    "supertest": "4.0.2"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "test": "jest --testMatch '**/test/**/*.test.js' --coverage",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  }
+}

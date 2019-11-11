@@ -1,0 +1,74 @@
+# Default values for finance-portal-backend-service
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+image:
+  repository: casablanca-casa-docker-release.jfrog.io/finance-portal-backend-service
+  tag: v10.7.2
+  pullPolicy: Always
+
+service:
+  type: ClusterIP
+  port: 3000
+
+db:
+  protocol: 'mysql'
+  host: '$release_name-centralledger-mysql'
+  port: '3306'
+  user: 'central_ledger'
+  password: 'oyMxgZChuu'
+  schema: 'central_ledger'
+
+init:
+  image: casablanca-casa-docker-release.jfrog.io/wso2is-populate:v10.6.4
+  pullPolicy: Always
+
+env: 'dev' # env used to determine the deployment env, used for deciding the JWS keys
+
+secretsMountPoint: '/secrets'
+
+imageCredentials:
+  name: dock-casa-secret
+
+config:
+  settlementsEndpoint: 'centralsettlement:3007/v1'
+  centralLedgerEndpoint: 'centralledger-service:3001'
+  settlementManagementEndpoint: 'casa-settlement-management'
+  settlementManagementPort: '5000'
+  wso2oauthServer: 'https://localhost'
+  wso2oauthPort: '9443'
+  wso2oauthLoginPath: '/oauth2/token'
+  wso2oauthTokenValidationPath: '/oauth2/introspect'
+  wso2oauthUserInfo: '/oauth2/userinfo'
+  wso2oauthTokenRevoke: '/oauth2/revoke'
+  wso2oauthClientKey: 'testkey'
+  wso2oauthClientSecret: 'testsecret'
+  wso2BypassAuth: 'true'
+  wso2InsecureCookie: 'false'
+  wso2is_populate:
+    http:
+      endpoint: 'scim2'
+      timeout: 60000
+    authentication:
+      type: 'basic'
+      credentials:
+        username: 'admin'
+        password: 'admin'
+  jasperUser: 'user'
+  jasperPassword: 'password'
+
+ingress:
+  enabled: true
+  externalPath: /api
+  # Used to create an Ingress record.
+  hosts:
+    api: finance-portal-backend-service.local
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: '/'
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  tls:
+    # Secrets must be manually created in the namespace.
+    # - secretName: chart-example-tls
+    #   hosts:
+    #     - chart-example.local

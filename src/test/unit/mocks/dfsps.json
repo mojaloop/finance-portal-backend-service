@@ -1,0 +1,642 @@
+[
+  {
+    "name": "DFSP1",
+    "id": "dev-casa-interop-switch.casahub.live/participants/DFSP1",
+    "created": "2019-07-30T22:26:44.000Z",
+    "isActive": 1,
+    "links": {
+      "self": "dev-casa-interop-switch.casahub.live/participants/DFSP1"
+    },
+    "accounts": [
+      {
+        "id": 41,
+        "ledgerAccountType": "POSITION",
+        "currency": "EUR",
+        "isActive": 1,
+        "createdDate": "2019-07-30T22:26:44.000Z",
+        "createdBy": "unknown"
+      },
+      {
+        "id": 42,
+        "ledgerAccountType": "SETTLEMENT",
+        "currency": "EUR",
+        "isActive": 1,
+        "createdDate": "2019-07-30T22:26:44.000Z",
+        "createdBy": "unknown"
+      }
+    ]
+  },
+  {
+    "name": "DFSP2",
+    "id": "dev-casa-interop-switch.casahub.live/participants/DFSP2",
+    "created": "2019-07-30T22:27:34.000Z",
+    "isActive": 1,
+    "links": {
+      "self": "dev-casa-interop-switch.casahub.live/participants/DFSP2"
+    },
+    "accounts": [
+      {
+        "id": 43,
+        "ledgerAccountType": "POSITION",
+        "currency": "XOF",
+        "isActive": 1,
+        "createdDate": "2019-07-30T22:27:35.000Z",
+        "createdBy": "unknown"
+      },
+      {
+        "id": 44,
+        "ledgerAccountType": "SETTLEMENT",
+        "currency": "XOF",
+        "isActive": 1,
+        "createdDate": "2019-07-30T22:27:35.000Z",
+        "createdBy": "unknown"
+      }
+    ]
+  },
+  {
+    "name": "FXPEUR",
+    "id": "dev-casa-interop-switch.casahub.live/participants/FXPEUR",
+    "created": "2019-07-30T22:30:11.000Z",
+    "isActive": 1,
+    "links": {
+      "self": "dev-casa-interop-switch.casahub.live/participants/FXPEUR"
+    },
+    "accounts": [
+      {
+        "id": 45,
+        "ledgerAccountType": "POSITION",
+        "currency": "EUR",
+        "isActive": 1,
+        "createdDate": "2019-07-30T22:30:11.000Z",
+        "createdBy": "unknown"
+      },
+      {
+        "id": 46,
+        "ledgerAccountType": "SETTLEMENT",
+        "currency": "EUR",
+        "isActive": 1,
+        "createdDate": "2019-07-30T22:30:11.000Z",
+        "createdBy": "unknown"
+      }
+    ]
+  },
+  {
+    "name": "FXPXOF",
+    "id": "dev-casa-interop-switch.casahub.live/participants/FXPXOF",
+    "created": "2019-07-30T22:30:34.000Z",
+    "isActive": 1,
+    "links": {
+      "self": "dev-casa-interop-switch.casahub.live/participants/FXPXOF"
+    },
+    "accounts": [
+      {
+        "id": 47,
+        "ledgerAccountType": "POSITION",
+        "currency": "XOF",
+        "isActive": 1,
+        "createdDate": "2019-07-30T22:30:34.000Z",
+        "createdBy": "unknown"
+      },
+      {
+        "id": 48,
+        "ledgerAccountType": "SETTLEMENT",
+        "currency": "XOF",
+        "isActive": 1,
+        "createdDate": "2019-07-30T22:30:34.000Z",
+        "createdBy": "unknown"
+      }
+    ]
+  },
+  {
+    "name": "gbdfsp2",
+    "id": "dev-casa-interop-switch.casahub.live/participants/gbdfsp2",
+    "created": "2019-07-30T12:25:40.000Z",
+    "isActive": 1,
+    "links": {
+      "self": "dev-casa-interop-switch.casahub.live/participants/gbdfsp2"
+    },
+    "accounts": [
+      {
+        "id": 37,
+        "ledgerAccountType": "POSITION",
+        "currency": "USD",
+        "isActive": 1,
+        "createdDate": "2019-07-30T12:25:40.000Z",
+        "createdBy": "unknown"
+      },
+      {
+        "id": 38,
+        "ledgerAccountType": "SETTLEMENT",
+        "currency": "USD",
+        "isActive": 1,
+        "createdDate": "2019-07-30T12:25:40.000Z",
+        "createdBy": "unknown"
+      }
+    ]
+  },
+  {
+    "name": "goldenpayeefsp",
+    "id": "dev-casa-interop-switch.casahub.live/participants/goldenpayeefsp",
+    "created": "2019-07-21T22:59:25.000Z",
+    "isActive": 1,
+    "links": {
+      "self": "dev-casa-interop-switch.casahub.live/participants/goldenpayeefsp"
+    },
+    "accounts": [
+      {
+        "id": 35,
+        "ledgerAccountType": "POSITION",
+        "currency": "XOF",
+        "isActive": 1,
+        "createdDate": "2019-07-21T22:59:25.000Z",
+        "createdBy": "unknown"
+      },
+      {
+        "id": 36,
+        "ledgerAccountType": "SETTLEMENT",
+        "currency": "XOF",
+        "isActive": 1,
+        "createdDate": "2019-07-21T22:59:25.000Z",
+        "createdBy": "unknown"
+      }
+    ]
+  },
+  {
+    "name": "goldenpayerfsp",
+    "id": "dev-casa-interop-switch.casahub.live/participants/goldenpayerfsp",
+    "created": "2019-07-21T22:31:46.000Z",
+    "isActive": 1,
+    "links": {
+      "self": "dev-casa-interop-switch.casahub.live/participants/goldenpayerfsp"
+    },
+    "accounts": [
+      {
+        "id": 33,
+        "ledgerAccountType": "POSITION",
+        "currency": "XOF",
+        "isActive": 1,
+        "createdDate": "2019-07-21T22:31:46.000Z",
+        "createdBy": "unknown"
+      },
+      {
+        "id": 34,
+        "ledgerAccountType": "SETTLEMENT",
+        "currency": "XOF",
+        "isActive": 1,
+        "createdDate": "2019-07-21T22:31:46.000Z",
+        "createdBy": "unknown"
+      }
+    ]
+  },
+  {
+    "name": "Hub",
+    "id": "dev-casa-interop-switch.casahub.live/participants/Hub",
+    "created": "2019-03-27T16:19:26.000Z",
+    "isActive": 1,
+    "links": {
+      "self": "dev-casa-interop-switch.casahub.live/participants/Hub"
+    },
+    "accounts": [
+      {
+        "id": 40,
+        "ledgerAccountType": "HUB_RECONCILIATION",
+        "currency": "EUR",
+        "isActive": 1,
+        "createdDate": "2019-07-30T22:26:30.000Z",
+        "createdBy": "unknown"
+      },
+      {
+        "id": 39,
+        "ledgerAccountType": "HUB_MULTILATERAL_SETTLEMENT",
+        "currency": "EUR",
+        "isActive": 1,
+        "createdDate": "2019-07-30T22:26:12.000Z",
+        "createdBy": "unknown"
+      },
+      {
+        "id": 50,
+        "ledgerAccountType": "HUB_RECONCILIATION",
+        "currency": "INR",
+        "isActive": 1,
+        "createdDate": "2019-08-01T22:12:39.000Z",
+        "createdBy": "unknown"
+      },
+      {
+        "id": 49,
+        "ledgerAccountType": "HUB_MULTILATERAL_SETTLEMENT",
+        "currency": "INR",
+        "isActive": 1,
+        "createdDate": "2019-08-01T22:12:24.000Z",
+        "createdBy": "unknown"
+      },
+      {
+        "id": 20,
+        "ledgerAccountType": "HUB_RECONCILIATION",
+        "currency": "USD",
+        "isActive": 1,
+        "createdDate": "2019-05-13T17:39:36.000Z",
+        "createdBy": "unknown"
+      },
+      {
+        "id": 19,
+        "ledgerAccountType": "HUB_MULTILATERAL_SETTLEMENT",
+        "currency": "USD",
+        "isActive": 1,
+        "createdDate": "2019-05-13T17:39:32.000Z",
+        "createdBy": "unknown"
+      },
+      {
+        "id": 2,
+        "ledgerAccountType": "HUB_RECONCILIATION",
+        "currency": "XOF",
+        "isActive": 1,
+        "createdDate": "2019-03-28T20:58:10.000Z",
+        "createdBy": "unknown"
+      },
+      {
+        "id": 1,
+        "ledgerAccountType": "HUB_MULTILATERAL_SETTLEMENT",
+        "currency": "XOF",
+        "isActive": 1,
+        "createdDate": "2019-03-28T18:34:16.000Z",
+        "createdBy": "unknown"
+      }
+    ]
+  },
+  {
+    "name": "noresponsepayeefsp",
+    "id": "dev-casa-interop-switch.casahub.live/participants/noresponsepayeefsp",
+    "created": "2019-03-31T00:50:49.000Z",
+    "isActive": 1,
+    "links": {
+      "self": "dev-casa-interop-switch.casahub.live/participants/noresponsepayeefsp"
+    },
+    "accounts": [
+      {
+        "id": 7,
+        "ledgerAccountType": "POSITION",
+        "currency": "XOF",
+        "isActive": 1,
+        "createdDate": "2019-03-31T00:50:49.000Z",
+        "createdBy": "unknown"
+      },
+      {
+        "id": 8,
+        "ledgerAccountType": "SETTLEMENT",
+        "currency": "XOF",
+        "isActive": 1,
+        "createdDate": "2019-03-31T00:50:49.000Z",
+        "createdBy": "unknown"
+      }
+    ]
+  },
+  {
+    "name": "OCI",
+    "id": "dev-casa-interop-switch.casahub.live/participants/OCI",
+    "created": "2019-03-31T00:51:15.000Z",
+    "isActive": 1,
+    "links": {
+      "self": "dev-casa-interop-switch.casahub.live/participants/OCI"
+    },
+    "accounts": [
+      {
+        "id": 17,
+        "ledgerAccountType": "POSITION",
+        "currency": "XOF",
+        "isActive": 0,
+        "createdDate": "2019-03-31T00:51:15.000Z",
+        "createdBy": "unknown"
+      },
+      {
+        "id": 18,
+        "ledgerAccountType": "SETTLEMENT",
+        "currency": "XOF",
+        "isActive": 0,
+        "createdDate": "2019-03-31T00:51:15.000Z",
+        "createdBy": "unknown"
+      }
+    ]
+  },
+  {
+    "name": "payeefsp",
+    "id": "dev-casa-interop-switch.casahub.live/participants/payeefsp",
+    "created": "2019-03-31T00:48:14.000Z",
+    "isActive": 1,
+    "links": {
+      "self": "dev-casa-interop-switch.casahub.live/participants/payeefsp"
+    },
+    "accounts": [
+      {
+        "id": 23,
+        "ledgerAccountType": "POSITION",
+        "currency": "USD",
+        "isActive": 0,
+        "createdDate": "2019-05-13T17:40:17.000Z",
+        "createdBy": "unknown"
+      },
+      {
+        "id": 24,
+        "ledgerAccountType": "SETTLEMENT",
+        "currency": "USD",
+        "isActive": 1,
+        "createdDate": "2019-05-13T17:40:17.000Z",
+        "createdBy": "unknown"
+      },
+      {
+        "id": 5,
+        "ledgerAccountType": "POSITION",
+        "currency": "XOF",
+        "isActive": 1,
+        "createdDate": "2019-03-31T00:48:14.000Z",
+        "createdBy": "unknown"
+      },
+      {
+        "id": 6,
+        "ledgerAccountType": "SETTLEMENT",
+        "currency": "XOF",
+        "isActive": 1,
+        "createdDate": "2019-03-31T00:48:14.000Z",
+        "createdBy": "unknown"
+      }
+    ]
+  },
+  {
+    "name": "payerfsp",
+    "id": "dev-casa-interop-switch.casahub.live/participants/payerfsp",
+    "created": "2019-03-28T21:00:38.000Z",
+    "isActive": 1,
+    "links": {
+      "self": "dev-casa-interop-switch.casahub.live/participants/payerfsp"
+    },
+    "accounts": [
+      {
+        "id": 21,
+        "ledgerAccountType": "POSITION",
+        "currency": "USD",
+        "isActive": 0,
+        "createdDate": "2019-05-13T17:39:57.000Z",
+        "createdBy": "unknown"
+      },
+      {
+        "id": 22,
+        "ledgerAccountType": "SETTLEMENT",
+        "currency": "USD",
+        "isActive": 1,
+        "createdDate": "2019-05-13T17:39:57.000Z",
+        "createdBy": "unknown"
+      },
+      {
+        "id": 3,
+        "ledgerAccountType": "POSITION",
+        "currency": "XOF",
+        "isActive": 1,
+        "createdDate": "2019-03-28T21:00:38.000Z",
+        "createdBy": "unknown"
+      },
+      {
+        "id": 4,
+        "ledgerAccountType": "SETTLEMENT",
+        "currency": "XOF",
+        "isActive": 1,
+        "createdDate": "2019-03-28T21:00:38.000Z",
+        "createdBy": "unknown"
+      }
+    ]
+  },
+  {
+    "name": "testfsp1",
+    "id": "dev-casa-interop-switch.casahub.live/participants/testfsp1",
+    "created": "2019-03-31T00:50:50.000Z",
+    "isActive": 1,
+    "links": {
+      "self": "dev-casa-interop-switch.casahub.live/participants/testfsp1"
+    },
+    "accounts": [
+      {
+        "id": 55,
+        "ledgerAccountType": "POSITION",
+        "currency": "EUR",
+        "isActive": 1,
+        "createdDate": "2019-08-01T22:26:09.000Z",
+        "createdBy": "unknown"
+      },
+      {
+        "id": 56,
+        "ledgerAccountType": "SETTLEMENT",
+        "currency": "EUR",
+        "isActive": 1,
+        "createdDate": "2019-08-01T22:26:09.000Z",
+        "createdBy": "unknown"
+      },
+      {
+        "id": 57,
+        "ledgerAccountType": "POSITION",
+        "currency": "INR",
+        "isActive": 1,
+        "createdDate": "2019-08-01T22:26:18.000Z",
+        "createdBy": "unknown"
+      },
+      {
+        "id": 58,
+        "ledgerAccountType": "SETTLEMENT",
+        "currency": "INR",
+        "isActive": 1,
+        "createdDate": "2019-08-01T22:26:18.000Z",
+        "createdBy": "unknown"
+      },
+      {
+        "id": 25,
+        "ledgerAccountType": "POSITION",
+        "currency": "USD",
+        "isActive": 1,
+        "createdDate": "2019-07-17T20:39:39.000Z",
+        "createdBy": "unknown"
+      },
+      {
+        "id": 26,
+        "ledgerAccountType": "SETTLEMENT",
+        "currency": "USD",
+        "isActive": 1,
+        "createdDate": "2019-07-17T20:39:39.000Z",
+        "createdBy": "unknown"
+      },
+      {
+        "id": 9,
+        "ledgerAccountType": "POSITION",
+        "currency": "XOF",
+        "isActive": 1,
+        "createdDate": "2019-03-31T00:50:50.000Z",
+        "createdBy": "unknown"
+      },
+      {
+        "id": 10,
+        "ledgerAccountType": "SETTLEMENT",
+        "currency": "XOF",
+        "isActive": 1,
+        "createdDate": "2019-03-31T00:50:50.000Z",
+        "createdBy": "unknown"
+      }
+    ]
+  },
+  {
+    "name": "testfsp2",
+    "id": "dev-casa-interop-switch.casahub.live/participants/testfsp2",
+    "created": "2019-03-31T00:50:56.000Z",
+    "isActive": 1,
+    "links": {
+      "self": "dev-casa-interop-switch.casahub.live/participants/testfsp2"
+    },
+    "accounts": [
+      {
+        "id": 51,
+        "ledgerAccountType": "POSITION",
+        "currency": "INR",
+        "isActive": 1,
+        "createdDate": "2019-08-01T22:13:48.000Z",
+        "createdBy": "unknown"
+      },
+      {
+        "id": 52,
+        "ledgerAccountType": "SETTLEMENT",
+        "currency": "INR",
+        "isActive": 1,
+        "createdDate": "2019-08-01T22:13:48.000Z",
+        "createdBy": "unknown"
+      },
+      {
+        "id": 27,
+        "ledgerAccountType": "POSITION",
+        "currency": "USD",
+        "isActive": 0,
+        "createdDate": "2019-07-17T20:39:47.000Z",
+        "createdBy": "unknown"
+      },
+      {
+        "id": 28,
+        "ledgerAccountType": "SETTLEMENT",
+        "currency": "USD",
+        "isActive": 1,
+        "createdDate": "2019-07-17T20:39:47.000Z",
+        "createdBy": "unknown"
+      },
+      {
+        "id": 11,
+        "ledgerAccountType": "POSITION",
+        "currency": "XOF",
+        "isActive": 0,
+        "createdDate": "2019-03-31T00:50:56.000Z",
+        "createdBy": "unknown"
+      },
+      {
+        "id": 12,
+        "ledgerAccountType": "SETTLEMENT",
+        "currency": "XOF",
+        "isActive": 1,
+        "createdDate": "2019-03-31T00:50:56.000Z",
+        "createdBy": "unknown"
+      }
+    ]
+  },
+  {
+    "name": "testfsp3",
+    "id": "dev-casa-interop-switch.casahub.live/participants/testfsp3",
+    "created": "2019-03-31T00:51:03.000Z",
+    "isActive": 1,
+    "links": {
+      "self": "dev-casa-interop-switch.casahub.live/participants/testfsp3"
+    },
+    "accounts": [
+      {
+        "id": 53,
+        "ledgerAccountType": "POSITION",
+        "currency": "EUR",
+        "isActive": 1,
+        "createdDate": "2019-08-01T22:18:49.000Z",
+        "createdBy": "unknown"
+      },
+      {
+        "id": 54,
+        "ledgerAccountType": "SETTLEMENT",
+        "currency": "EUR",
+        "isActive": 1,
+        "createdDate": "2019-08-01T22:18:49.000Z",
+        "createdBy": "unknown"
+      },
+      {
+        "id": 29,
+        "ledgerAccountType": "POSITION",
+        "currency": "USD",
+        "isActive": 0,
+        "createdDate": "2019-07-17T20:40:01.000Z",
+        "createdBy": "unknown"
+      },
+      {
+        "id": 30,
+        "ledgerAccountType": "SETTLEMENT",
+        "currency": "USD",
+        "isActive": 1,
+        "createdDate": "2019-07-17T20:40:01.000Z",
+        "createdBy": "unknown"
+      },
+      {
+        "id": 13,
+        "ledgerAccountType": "POSITION",
+        "currency": "XOF",
+        "isActive": 0,
+        "createdDate": "2019-03-31T00:51:03.000Z",
+        "createdBy": "unknown"
+      },
+      {
+        "id": 14,
+        "ledgerAccountType": "SETTLEMENT",
+        "currency": "XOF",
+        "isActive": 1,
+        "createdDate": "2019-03-31T00:51:03.000Z",
+        "createdBy": "unknown"
+      }
+    ]
+  },
+  {
+    "name": "testfsp4",
+    "id": "dev-casa-interop-switch.casahub.live/participants/testfsp4",
+    "created": "2019-03-31T00:51:09.000Z",
+    "isActive": 1,
+    "links": {
+      "self": "dev-casa-interop-switch.casahub.live/participants/testfsp4"
+    },
+    "accounts": [
+      {
+        "id": 31,
+        "ledgerAccountType": "POSITION",
+        "currency": "USD",
+        "isActive": 0,
+        "createdDate": "2019-07-17T20:40:05.000Z",
+        "createdBy": "unknown"
+      },
+      {
+        "id": 32,
+        "ledgerAccountType": "SETTLEMENT",
+        "currency": "USD",
+        "isActive": 1,
+        "createdDate": "2019-07-17T20:40:05.000Z",
+        "createdBy": "unknown"
+      },
+      {
+        "id": 15,
+        "ledgerAccountType": "POSITION",
+        "currency": "XOF",
+        "isActive": 1,
+        "createdDate": "2019-03-31T00:51:09.000Z",
+        "createdBy": "unknown"
+      },
+      {
+        "id": 16,
+        "ledgerAccountType": "SETTLEMENT",
+        "currency": "XOF",
+        "isActive": 1,
+        "createdDate": "2019-03-31T00:51:09.000Z",
+        "createdBy": "unknown"
+      }
+    ]
+  }
+]
