@@ -1,7 +1,7 @@
 {
   "name": "@mojaloop/finance-portal-backend-service",
   "version": "0.0.1-snapshot",
-  "description": "The backend service to support the finance portal web ui. Essentially a thin wrapper around SQL queries",
+  "description": "The backend service to support the finance portal web ui. Essentially a thin wrapper around SQL queries.",
   "license": "Apache-2.0",
   "contributors": [
     "Matt Kingston, ModusBox Inc."
