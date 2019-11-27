@@ -355,6 +355,8 @@ jobs:
       - run:
           <<: *defaults_build_docker_build
       - run:
+          <<: *defaults_build_docker_build_release
+      - run:
           <<: *defaults_license_scanner
       - run:
           name: Run the license-scanner
@@ -364,6 +366,8 @@ jobs:
           prefix: licenses
       - run:
           <<: *defaults_build_docker_publish
+      - run:
+          <<: *defaults_build_docker_publish_release
       - run:
           <<: *defaults_slack_announcement
 
