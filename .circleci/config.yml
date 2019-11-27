@@ -193,7 +193,7 @@ jobs:
           command: npm install -g tapes
       - run:
           name: Execute unit tests
-          command: npm -s run test:xunit > ./test/results/tape.xml
+          command: cd src && (npm run test > /test/results/results.txt)
       - store_artifacts:
           path: ./test/results
           prefix: test
@@ -256,27 +256,27 @@ jobs:
 #      - store_test_results:
 #          path: ./test/results
 
-  vulnerability-check:
-    <<: *defaults_working_directory
-    <<: *defaults_docker_node
-    steps:
-      - checkout
-      - run:
-          name: Install general dependencies
-          command: *defaults_Dependencies
-      - restore_cache:
-          keys:
-            - dependency-cache-{{ checksum "package.json" }}
-            - dependency-cache-
-      - run:
-          name: Create dir for test results
-          command: mkdir -p ./audit/results
-      - run:
-          name: Check for new npm vulnerabilities
-          command: npm run audit:check --silent -- --json > ./audit/results/auditResults.json
-      - store_artifacts:
-          path: ./audit/results
-          prefix: audit
+#  vulnerability-check:
+#    <<: *defaults_working_directory
+#    <<: *defaults_docker_node
+#    steps:
+#      - checkout
+#      - run:
+#          name: Install general dependencies
+#          command: *defaults_Dependencies
+#      - restore_cache:
+#          keys:
+#            - dependency-cache-{{ checksum "package.json" }}
+#            - dependency-cache-
+#      - run:
+#          name: Create dir for test results
+#          command: mkdir -p ./audit/results
+#      - run:
+#          name: Check for new npm vulnerabilities
+#          command: npm run audit:check --silent -- --json > ./audit/results/auditResults.json
+#      - store_artifacts:
+#          path: ./audit/results
+#          prefix: audit
 
   audit-licenses:
     <<: *defaults_working_directory
@@ -484,17 +484,17 @@ workflows:
       #              ignore:
       #                - /feature*/
       #                - /bugfix*/
-      - vulnerability-check:
-          context: org-global
-          requires:
-            - setup
-          filters:
-            tags:
-              only: /.*/
-            branches:
-              ignore:
-                - /feature*/
-                - /bugfix*/
+#      - vulnerability-check:
+#          context: org-global
+#          requires:
+#            - setup
+#          filters:
+#            tags:
+#              only: /.*/
+#            branches:
+#              ignore:
+#                - /feature*/
+#                - /bugfix*/
       - audit-licenses:
           context: org-global
           requires:
