@@ -187,7 +187,7 @@ jobs:
           command: cd src && mkdir -p ./test/results
       - run:
           name: Execute unit tests
-          command: cd src && (npm run test > /test/results/results.txt)
+          command: cd src && (npm run test > ./test/results/results.txt)
       - store_artifacts:
           path: ./test/results
           prefix: test
