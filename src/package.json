@@ -19,7 +19,7 @@
     "axios": "0.18.1",
     "base64url": "3.0.1",
     "big.js": "5.2.2",
-    "@mojaloop/finance-portal-lib": "0.0.1-snapshot",
+    "@mojaloop/finance-portal-lib": "0.0.2-snapshot",
     "dotenv": "6.2.0",
     "glob": "7.1.4",
     "json-2-csv": "3.5.3",
