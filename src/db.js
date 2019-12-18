@@ -117,6 +117,8 @@ const currentSettlementWindowQueryReceipts = `
   GROUP BY qpPayer.fspId, qpPayer.participantId, q.currencyId, sw.createdDate
 `;
 
+const currentSettlementWindowId = 'select settlementWindowId from settlementWindow order by settlementWindowId DESC LIMIT 1;';
+
 // TODO: the limit history is being kept in the participantLimit table, so we need to return only
 // the most recent limit for each currency.
 const positionQuery = `
@@ -542,6 +544,11 @@ module.exports = class Database {
               && pv[cv.currency].limitCreatedDate > cv.limitCreatedDate) ? pv[cv.currency] : cv,
         }), {});
         return Object.values(result);
+    }
+
+    async getCurrentSettlementWindowId() {
+      const thisSettlementWindowId = await this.connection.query(currentSettlementWindowId);
+      return thisSettlementWindowId[0][0].settlementWindowId;
     }
 
     async getCurrentSettlementWindowInfo(participantId) {
