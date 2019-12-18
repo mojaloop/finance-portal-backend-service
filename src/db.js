@@ -117,7 +117,13 @@ const currentSettlementWindowQueryReceipts = `
   GROUP BY qpPayer.fspId, qpPayer.participantId, q.currencyId, sw.createdDate
 `;
 
-const currentSettlementWindowId = 'select settlementWindowId from settlementWindow order by settlementWindowId DESC LIMIT 1;';
+const currentSettlementWindowId = `SELECT sw.settlementWindowId 
+  FROM central_ledger.settlementWindow sw
+  INNER JOIN central_ledger.settlementWindowStateChange AS swOpen
+  ON swOpen.settlementWindowId = sw.settlementWindowId
+  WHERE swOpen.settlementWindowStateId = 'OPEN'
+  order by swOpen.createdDate DESC LIMIT 1;
+`;
 
 // TODO: the limit history is being kept in the participantLimit table, so we need to return only
 // the most recent limit for each currency.
