@@ -12,7 +12,7 @@ RUN npm install
 FROM node:8.11.3-alpine
 WORKDIR /opt/finance-portal-backend-service
 
-COPY --from=builder /opt/finance-portal-backend-service ./src
-COPY ./src ./src
+COPY --from=builder /opt/finance-portal-backend-service /opt/finance-portal-backend-service
+COPY ./src /opt/finance-portal-backend-service
 
-CMD ["node", "src/index.js"]
+CMD ["node", "/opt/finance-portal-backend-service/index.js"]
