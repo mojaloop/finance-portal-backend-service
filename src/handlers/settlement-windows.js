@@ -24,7 +24,7 @@ const handler = (router, routesContext) => {
         const settlementWindow = await routesContext.db.getSettlementWindowInfo(ctx.params.settlementWindowId);
 
         if (currentSettlementWindowId !== thisSettlementWindowId) {
-            const api = new Model({ endpoint: routesContext.config.centralLedgerEndpoint });
+            const api = new Model({ endpoint: routesContext.config.settlementsEndpoint });
             const settlement = await api.getSettlements({ settlementWindowId: ctx.params.settlementWindowId });
             settlementWindow.settlement = (settlement.length === 1 ? settlement[0] : {});
         } else {
