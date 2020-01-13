@@ -38,7 +38,6 @@ const config = {
     },
     reportUrls: {
     },
-    JWSKeys: [...Object.keys(process.env).filter(key => /JWS_KEY_/.test(key)).map((key) => { const entry = { [key]: process.env[key] }; return entry; })],
 };
 
 module.exports = config;
