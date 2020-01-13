@@ -5,6 +5,8 @@ const util = require('util');
 
 const AzureLog = require('../lib/azureLog');
 
+const pubKeys = fs.readdirSync('secrets').map(fname => fs.readFileSync(`secrets/${fname}`, 'utf-8'));
+
 const handler = (router, routesContext) => {
     router.get('/validate-transfer/:transferId', async (ctx, next) => {
         const transfer = await routesContext.db.getTransferDetails(ctx.params.transferId);
@@ -25,10 +27,7 @@ const handler = (router, routesContext) => {
             const token = `${check.protectedHeader}.${check.body}.${check.signature}`;
 
             try {
-                // TODO: Optimize below for loop
-                // eslint-disable-next-line
-                for (const jwsKey of config.JWSKeys) {
-                    const pubKey = fs.readFileSync(Object.values(jwsKey)[0], 'utf-8');
+                for (const pubKey of pubKeys) {
                     // TODO: Investigate the linting error
                     // eslint-disable-next-line
                     JWT.verify(token, pubKey, (err) => {
