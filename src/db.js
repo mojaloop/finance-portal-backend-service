@@ -4,7 +4,7 @@ const MYSQL_MIN_DATETIME = '1000-01-01';
 const MYSQL_MAX_DATETIME = '9999-12-31';
 
 const previousSettlementWindowDataQuery = `
-  SELECT id, MAX(payments) AS payments, MAX(receipts) AS receipts, MAX(numPayments) AS numPayments, MAX(numReceipts) AS numReceipts, curr, open, close FROM
+  SELECT id, MAX(payments) AS payments, MAX(receipts) AS receipts, MAX(numPayments) AS numPayments, MAX(numReceipts) AS numReceipts, curr, ANY_VALUE(open), ANY_VALUE(close) FROM
   (
     (
       SELECT
@@ -38,8 +38,8 @@ const previousSettlementWindowDataQuery = `
         SUM(CASE WHEN tprt.name = 'PAYEE_DFSP' THEN q.amount ELSE 0 END) as receipts,
         COUNT(CASE WHEN tprt.name = 'PAYER_DFSP' THEN q.amount ELSE NULL END) as numPayments,
         COUNT(CASE WHEN tprt.name = 'PAYEE_DFSP' THEN q.amount ELSE NULL END) as numReceipts,
-        q.currencyId AS curr,
-        swOpen.createdDate AS open,
+        ANY_VALUE(q.currencyId) AS curr,
+        ANY_VALUE(swOpen.createdDate) AS open,
         swClose.createdDate AS close
       FROM central_ledger.settlementWindowStateChange AS swClose
       INNER JOIN central_ledger.settlementWindowStateChange AS swOpen ON swOpen.settlementWindowId = swClose.settlementWindowId
@@ -74,7 +74,7 @@ const previousSettlementWindowDataQuery = `
 // TODO: evaluate what information in this query is not necessary for the UI
 // TODO: remove the LIMIT 1 clause at the end of this query
 const currentSettlementWindowQueryPayments = `
-  SELECT SUM(q.amount) AS senderAmount, COUNT(q.amount) AS numTransactions, qpPayer.fspId, qpPayer.participantId, q.currencyId, sw.createdDate AS settlementWindowOpen, sw.settlementWindowId
+  SELECT SUM(q.amount) AS senderAmount, COUNT(q.amount) AS numTransactions, qpPayer.fspId, qpPayer.participantId, q.currencyId, sw.createdDate AS settlementWindowOpen, ANY_VALUE(sw.settlementWindowId)
   FROM central_ledger.transferFulfilment AS tf
   INNER JOIN central_ledger.transactionReference AS tr ON tf.transferId = tr.transactionReferenceId
   INNER JOIN central_ledger.quote AS q ON tr.quoteId = q.quoteId
@@ -98,7 +98,7 @@ const currentSettlementWindowQueryPayments = `
 //       numTransactions, senderAmount, and perhaps fspId.
 // TODO: remove the LIMIT 1 clause at the end of this query
 const currentSettlementWindowQueryReceipts = `
-  SELECT SUM(q.amount) AS senderAmount, COUNT(q.amount) AS numTransactions, qpPayer.fspId, qpPayer.participantId, q.currencyId, sw.createdDate AS settlementWindowOpen, sw.settlementWindowId
+  SELECT SUM(q.amount) AS senderAmount, COUNT(q.amount) AS numTransactions, qpPayer.fspId, qpPayer.participantId, q.currencyId, sw.createdDate AS settlementWindowOpen, ANY_VALUE(sw.settlementWindowId)
   FROM central_ledger.transferFulfilment AS tf
   INNER JOIN central_ledger.transactionReference AS tr ON tf.transferId = tr.transactionReferenceId
   INNER JOIN central_ledger.quote AS q ON tr.quoteId = q.quoteId
@@ -156,7 +156,7 @@ const positionQuery = `
 `;
 
 const historicalSettlementWindowDataQuery = `
-  SELECT id, MAX(payments) AS payments, MAX(receipts) AS receipts, MAX(numPayments) AS numPayments, MAX(numReceipts) AS numReceipts, curr, open, close FROM
+  SELECT id, MAX(payments) AS payments, MAX(receipts) AS receipts, MAX(numPayments) AS numPayments, MAX(numReceipts) AS numReceipts, curr, ANY_VALUE(open), ANY_VALUE(close) FROM
     (
       (
         SELECT
@@ -190,8 +190,8 @@ const historicalSettlementWindowDataQuery = `
           SUM(CASE WHEN tprt.name = 'PAYEE_DFSP' THEN q.amount ELSE 0 END) as receipts,
           COUNT(CASE WHEN tprt.name = 'PAYER_DFSP' THEN q.amount ELSE NULL END) as numPayments,
           COUNT(CASE WHEN tprt.name = 'PAYEE_DFSP' THEN q.amount ELSE NULL END) as numReceipts,
-          q.currencyId AS curr,
-          swOpen.createdDate AS open,
+          ANY_VALUE(q.currencyId) AS curr,
+          ANY_VALUE(swOpen.createdDate) AS open,
           swClose.createdDate AS close
         FROM central_ledger.settlementWindowStateChange AS swClose
         INNER JOIN central_ledger.settlementWindowStateChange AS swOpen ON swOpen.settlementWindowId = swClose.settlementWindowId
@@ -465,9 +465,15 @@ WHERE t.transferId = ?
 `;
 
 const settlementWindowListQuery = `
-SELECT settlementWindowId, settlementWindowStateId AS 'state', settlementWindowReason AS 'reason', 
-createdDate AS 'settlementWindowOpen', settlementWindowClose, sum(accountAmount) AS 'amount', accountCurrency AS 'currency'
-FROM 
+SELECT
+    settlementWindowId,
+    ANY_VALUE(settlementWindowStateId) AS 'state',
+    ANY_VALUE(settlementWindowReason) AS 'reason',
+    ANY_VALUE(createdDate) AS 'settlementWindowOpen',
+    ANY_VALUE(settlementWindowClose),
+    sum(accountAmount) AS 'amount',
+    accountCurrency AS 'currency'
+FROM
 (
   SELECT distinct sw.settlementWindowId,
             swsc.settlementWindowStateId, swsc.reason AS settlementWindowReason, sw.createdDate,
@@ -501,9 +507,9 @@ FROM
   WHERE swClose.settlementWindowStateId = 'CLOSED'
   AND stp.settlementId IS NULL
 
-  UNION ALL                
+  UNION ALL
 
-  SELECT 
+  SELECT
     sw.settlementWindowId,
     swsc.settlementWindowStateId AS 'state',
     swsc.reason AS 'reason',
