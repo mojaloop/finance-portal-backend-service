@@ -45,7 +45,7 @@ const createServer = (config, db, log, Database) => {
     app.use(async (ctx, next) => {
         if (ctx.request.path === '/') {
             try {
-                db.dummyQuery();
+                await db.dummyQuery();
                 ctx.response.status = 204;
             } catch (err) {
                 ctx.response.status = 500;
