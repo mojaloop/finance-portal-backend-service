@@ -5,7 +5,10 @@ const util = require('util');
 
 const AzureLog = require('../lib/azureLog');
 
-const pubKeys = fs.readdirSync('secrets').map(fname => fs.readFileSync(`secrets/${fname}`, 'utf-8'));
+const dir = './secrets'
+const pubKeys = fs.readdirSync(dir)
+                .filter(fname => !fs.statSync(`${dir}/${fname}`).isDirectory())
+                .map(fname => fs.readFileSync(`${dir}/${fname}`, 'utf-8'));
 
 const handler = (router, routesContext) => {
     router.get('/validate-transfer/:transferId', async (ctx, next) => {
