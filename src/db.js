@@ -4,7 +4,7 @@ const MYSQL_MIN_DATETIME = '1000-01-01';
 const MYSQL_MAX_DATETIME = '9999-12-31';
 
 const previousSettlementWindowDataQuery = `
-  SELECT id, MAX(payments) AS payments, MAX(receipts) AS receipts, MAX(numPayments) AS numPayments, MAX(numReceipts) AS numReceipts, curr, ANY_VALUE(open), ANY_VALUE(close) FROM
+  SELECT id, MAX(payments) AS payments, MAX(receipts) AS receipts, MAX(numPayments) AS numPayments, MAX(numReceipts) AS numReceipts, curr, ANY_VALUE(open), GROUP_CONCAT(ANY_VALUE(close)) FROM
   (
     (
       SELECT
