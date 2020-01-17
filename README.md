@@ -1,4 +1,9 @@
 # finance-portal-backend-service
+[![Git Commit](https://img.shields.io/github/last-commit/mojaloop/finance-portal-backend-service.svg?style=flat)](https://github.com/mojaloop/finance-portal-backend-service/commits/master)
+[![Git Releases](https://img.shields.io/github/release/mojaloop/finance-portal-backend-service.svg?style=flat)](https://github.com/mojaloop/finance-portal-backend-service/releases)
+[![Docker pulls](https://img.shields.io/docker/pulls/mojaloop/finance-portal-backend-service.svg?style=flat)](https://hub.docker.com/r/mojaloop/finance-portal-backend-service)
+[![CircleCI](https://circleci.com/gh/mojaloop/finance-portal-backend-service.svg?style=svg)](https://circleci.com/gh/mojaloop/finance-portal-backend-service)
+
 The backend service to support the admin portal web ui. Essentially a thin wrapper around SQL queries.
 
 ## TODO
