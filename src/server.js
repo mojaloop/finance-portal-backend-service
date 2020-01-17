@@ -79,7 +79,7 @@ const createServer = (config, db, log, Database) => {
     // Authorise all requests except login
     // TODO: authorise before handling CORS?
     app.use(async (ctx, next) => {
-        if (ctx.request.path === '/login' && ctx.request.method.toLowerCase() === 'post') {
+        if (ctx.request.path.split('/').pop() === 'login' && ctx.request.method.toLowerCase() === 'post') {
             log('bypassing validation on login request');
             await next();
             return;
