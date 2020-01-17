@@ -313,7 +313,7 @@ const historicalParticipantLimitQuery = `
 `;
 
 const settlementWindowInfoQuery = `
-SELECT totals.settlementWindowId, totals.settlementWindowStateId AS settlementWindowStateId, sum(totals.amount) AS amount, totals.currencyId,
+SELECT totals.settlementWindowId, totals.settlementWindowStateId AS settlementWindowStateId, sum(totals.amount) AS amount, GROUP_CONCAT(totals.currencyId),
   DATE_FORMAT(swOpen.createdDate, '%Y-%m-%dT%T.000Z') AS settlementWindowOpen,
   DATE_FORMAT(swClose.createdDate, '%Y-%m-%dT%T.000Z') AS settlementWindowClose
 FROM  (
