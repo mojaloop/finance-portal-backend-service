@@ -314,8 +314,8 @@ const historicalParticipantLimitQuery = `
 
 const settlementWindowInfoQuery = `
 SELECT totals.settlementWindowId, totals.settlementWindowStateId AS settlementWindowStateId, sum(totals.amount) AS amount, GROUP_CONCAT(totals.currencyId),
-  DATE_FORMAT(swOpen.createdDate, '%Y-%m-%dT%T.000Z') AS settlementWindowOpen,
-  DATE_FORMAT(swClose.createdDate, '%Y-%m-%dT%T.000Z') AS settlementWindowClose
+  DATE_FORMAT(MIN(swOpen.createdDate), '%Y-%m-%dT%T.000Z') AS settlementWindowOpen,
+  DATE_FORMAT(MIN(swClose.createdDate), '%Y-%m-%dT%T.000Z') AS settlementWindowClose
 FROM  (
   SELECT DISTINCT ssw.settlementWindowId, swsc.settlementWindowStateId, CASE WHEN spc.netAmount > 0 THEN spc.netAmount ELSE 0 END AS amount, pc.currencyId
     FROM settlement
