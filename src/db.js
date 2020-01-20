@@ -4,18 +4,18 @@ const MYSQL_MIN_DATETIME = '1000-01-01';
 const MYSQL_MAX_DATETIME = '9999-12-31';
 
 const previousSettlementWindowDataQuery = `
-  SELECT id, MAX(payments) AS payments, MAX(receipts) AS receipts, MAX(numPayments) AS numPayments, MAX(numReceipts) AS numReceipts, curr, ANY_VALUE(open), ANY_VALUE(close) FROM
+  SELECT id, MAX(payments) AS payments, MAX(receipts) AS receipts, MAX(numPayments) AS numPayments, MAX(numReceipts) AS numReceipts, curr, ANY_VALUE(open) as open, ANY_VALUE(close) as close FROM
   (
     (
       SELECT
-        sw.settlementWindowId AS id,
+        ANY_VALUE(sw.settlementWindowId) AS id,
         0 AS payments,
         0 AS receipts,
         0 AS numPayments,
         0 AS numReceipts,
-        c.currencyId AS curr,
-        swOpen.createdDate AS open,
-        swClose.createdDate AS close
+        ANY_VALUE(c.currencyId) AS curr,
+        ANY_VALUE(swOpen.createdDate) AS open,
+        ANY_VALUE(swClose.createdDate) AS close
       FROM central_ledger.settlementWindow sw
       INNER JOIN central_ledger.settlementWindowStateChange AS swClose ON swClose.settlementWindowId = sw.settlementWindowId
       INNER JOIN central_ledger.settlementWindowStateChange AS swOpen ON swOpen.settlementWindowId = sw.settlementWindowId
@@ -40,7 +40,7 @@ const previousSettlementWindowDataQuery = `
         COUNT(CASE WHEN tprt.name = 'PAYEE_DFSP' THEN q.amount ELSE NULL END) as numReceipts,
         ANY_VALUE(q.currencyId) AS curr,
         ANY_VALUE(swOpen.createdDate) AS open,
-        swClose.createdDate AS close
+        ANY_VALUE(swClose.createdDate) AS close
       FROM central_ledger.settlementWindowStateChange AS swClose
       INNER JOIN central_ledger.settlementWindowStateChange AS swOpen ON swOpen.settlementWindowId = swClose.settlementWindowId
       INNER JOIN central_ledger.transferFulfilment AS tf ON swClose.settlementWindowId = tf.settlementWindowId
@@ -156,7 +156,7 @@ const positionQuery = `
 `;
 
 const historicalSettlementWindowDataQuery = `
-  SELECT id, MAX(payments) AS payments, MAX(receipts) AS receipts, MAX(numPayments) AS numPayments, MAX(numReceipts) AS numReceipts, curr, ANY_VALUE(open), ANY_VALUE(close) FROM
+  SELECT id, MAX(payments) AS payments, MAX(receipts) AS receipts, MAX(numPayments) AS numPayments, MAX(numReceipts) AS numReceipts, curr, ANY_VALUE(open) as open, ANY_VALUE(close) as close FROM
     (
       (
         SELECT
@@ -166,8 +166,8 @@ const historicalSettlementWindowDataQuery = `
           0 AS numPayments,
           0 AS numReceipts,
           c.currencyId AS curr,
-          swOpen.createdDate AS open,
-          swClose.createdDate AS close
+          ANY_VALUE(swOpen.createdDate) AS open,
+          ANY_VALUE(swClose.createdDate) AS close
         FROM central_ledger.settlementWindow sw
         INNER JOIN central_ledger.settlementWindowStateChange AS swClose ON swClose.settlementWindowId = sw.settlementWindowId
         INNER JOIN central_ledger.settlementWindowStateChange AS swOpen ON swOpen.settlementWindowId = sw.settlementWindowId
@@ -192,7 +192,7 @@ const historicalSettlementWindowDataQuery = `
           COUNT(CASE WHEN tprt.name = 'PAYEE_DFSP' THEN q.amount ELSE NULL END) as numReceipts,
           ANY_VALUE(q.currencyId) AS curr,
           ANY_VALUE(swOpen.createdDate) AS open,
-          swClose.createdDate AS close
+          ANY_VALUE(swClose.createdDate) AS close
         FROM central_ledger.settlementWindowStateChange AS swClose
         INNER JOIN central_ledger.settlementWindowStateChange AS swOpen ON swOpen.settlementWindowId = swClose.settlementWindowId
         INNER JOIN central_ledger.transferFulfilment AS tf ON swClose.settlementWindowId = tf.settlementWindowId
@@ -209,7 +209,7 @@ const historicalSettlementWindowDataQuery = `
       )
       ORDER BY open
   ) T
-  WHERE T.open > ? AND T.close < ?
+  WHERE T.open > '2019-12-18T06:00:00.000Z' AND T.close < '2020-01-18T06:00:00.000Z'
   GROUP BY id, curr
 `;
 
