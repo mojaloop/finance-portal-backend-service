@@ -91,6 +91,8 @@ const createServer = (config, db, log, Database) => {
         }
 
         const token = ctx.request.get('Cookie').split('=').splice(1).join('');
+
+        log('validating request, token:', token);
         const opts = {
             method: 'POST',
             headers: {

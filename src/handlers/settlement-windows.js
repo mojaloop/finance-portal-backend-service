@@ -25,7 +25,6 @@ const handler = (router, routesContext) => {
             const settlement = await api.getSettlements({ settlementWindowId: ctx.params.settlementWindowId });
             settlementWindow.settlement = (settlement.length === 1 ? settlement[0] : {});
         } catch (err) {
-            routesContext.log(err);
             settlementWindow.settlement = {};
         }
         ctx.response.body = settlementWindow;

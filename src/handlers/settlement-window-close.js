@@ -10,7 +10,6 @@ const handler = (router, routesContext) => {
             await axios.post(`${routesContext.config.settlementManagementEndpoint}/close-window`, {});
             ctx.response.status = 200;
         } catch (err) {
-            console.log(err);
             ctx.response.status = 500;
         } finally {
             ctx.response.body = await handlerHelpers.getSettlementWindows(
