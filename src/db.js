@@ -313,7 +313,7 @@ const historicalParticipantLimitQuery = `
 `;
 
 const settlementWindowInfoQuery = `
-SELECT totals.settlementWindowId, totals.settlementWindowStateId AS settlementWindowStateId, sum(totals.amount) AS amount, GROUP_CONCAT(totals.currencyId),
+SELECT totals.settlementWindowId, totals.settlementWindowStateId AS settlementWindowStateId, sum(totals.amount) AS amount, ANY_VALUE(totals.currencyId) as currencyId,
   DATE_FORMAT(MIN(swOpen.createdDate), '%Y-%m-%dT%T.000Z') AS settlementWindowOpen,
   DATE_FORMAT(MIN(swClose.createdDate), '%Y-%m-%dT%T.000Z') AS settlementWindowClose
 FROM  (
@@ -365,7 +365,7 @@ SELECT sw.settlementWindowId, swsc.settlementWindowStateId, 0 AS amount, 'N/A' A
   AND swClose.settlementWindowStateId = 'CLOSED'
   AND swOpen.settlementWindowStateId = 'OPEN'
   AND ( NOT EXISTS (select 1 from central_ledger.settlement WHERE settlement.settlementId = ssw.settlementId)
-    OR NOT EXISTS (select 1 from settlementTransferParticipant stp WHERE stp.settlementId = ssw.settlementId))
+  OR NOT EXISTS (select 1 from settlementTransferParticipant stp WHERE stp.settlementId = ssw.settlementId))
 `;
 
 const outAmountQuery = `
