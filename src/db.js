@@ -82,7 +82,7 @@ const previousSettlementWindowDataQuery = `
 // TODO: evaluate what information in this query is not necessary for the UI
 // TODO: remove the LIMIT 1 clause at the end of this query
 const currentSettlementWindowQueryPayments = `
-  SELECT SUM(q.amount) AS senderAmount, COUNT(q.amount) AS numTransactions, qpPayer.fspId, qpPayer.participantId, q.currencyId, sw.createdDate AS settlementWindowOpen, ANY_VALUE(sw.settlementWindowId)
+  SELECT SUM(q.amount) AS senderAmount, COUNT(q.amount) AS numTransactions, qpPayer.fspId, qpPayer.participantId, q.currencyId, sw.createdDate AS settlementWindowOpen, ANY_VALUE(sw.settlementWindowId) AS settlementWindowId
   FROM central_ledger.transferFulfilment AS tf
   INNER JOIN central_ledger.transactionReference AS tr ON tf.transferId = tr.transactionReferenceId
   INNER JOIN central_ledger.quote AS q ON tr.quoteId = q.quoteId
@@ -106,7 +106,7 @@ const currentSettlementWindowQueryPayments = `
 //       numTransactions, senderAmount, and perhaps fspId.
 // TODO: remove the LIMIT 1 clause at the end of this query
 const currentSettlementWindowQueryReceipts = `
-  SELECT SUM(q.amount) AS senderAmount, COUNT(q.amount) AS numTransactions, qpPayer.fspId, qpPayer.participantId, q.currencyId, sw.createdDate AS settlementWindowOpen, ANY_VALUE(sw.settlementWindowId)
+  SELECT SUM(q.amount) AS senderAmount, COUNT(q.amount) AS numTransactions, qpPayer.fspId, qpPayer.participantId, q.currencyId, sw.createdDate AS settlementWindowOpen, ANY_VALUE(sw.settlementWindowId) AS settlementWindowId
   FROM central_ledger.transferFulfilment AS tf
   INNER JOIN central_ledger.transactionReference AS tr ON tf.transferId = tr.transactionReferenceId
   INNER JOIN central_ledger.quote AS q ON tr.quoteId = q.quoteId
