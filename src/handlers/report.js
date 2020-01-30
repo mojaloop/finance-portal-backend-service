@@ -25,7 +25,9 @@ const handler = (router, routesContext) => {
         };
 
         const reportUrl = new URL(routesContext.config.reportUrls[reportId]);
+        routesContext.log(`Found report URL: ${reportUrl}`);
         const completeUrl = await generateReportUrl(ctx.request, reportUrl, reportId);
+        routesContext.log(`Generated report request: ${completeUrl}`);
 
         try {
             const response = await fetch(completeUrl, opts);
