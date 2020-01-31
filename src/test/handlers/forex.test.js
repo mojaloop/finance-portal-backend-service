@@ -15,10 +15,9 @@ afterEach(async () => {
     server.close();
 });
 
-const expectedFxpRates = mockData.fxpRates;
-casaLib.admin.api.getFxpRatesPerCurrencyChannel = jest.fn();
-
 describe('GET /forex/rates', () => {
+    casaLib.admin.api.getFxpRatesPerCurrencyChannel = jest.fn();
+
     afterEach(() => {
         casaLib.admin.api.getFxpRatesPerCurrencyChannel.mockClear();
     });
@@ -40,7 +39,7 @@ describe('GET /forex/rates', () => {
 
             const response = await request(server).get('/forex/rates');
             expect(response.status).toEqual(200);
-            expect(response.body).toEqual(expectedFxpRates);
+            expect(response.body).toEqual(mockData.fxpRates);
         });
     });
 });
