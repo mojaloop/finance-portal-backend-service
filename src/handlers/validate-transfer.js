@@ -5,10 +5,10 @@ const util = require('util');
 
 const AzureLog = require('../lib/azureLog');
 
-const dir = './secrets'
+const dir = './secrets';
 const pubKeys = fs.readdirSync(dir)
-                .filter(fname => !fs.statSync(`${dir}/${fname}`).isDirectory())
-                .map(fname => fs.readFileSync(`${dir}/${fname}`, 'utf-8'));
+    .filter(fname => !fs.statSync(`${dir}/${fname}`).isDirectory())
+    .map(fname => fs.readFileSync(`${dir}/${fname}`, 'utf-8'));
 
 const handler = (router, routesContext) => {
     router.get('/validate-transfer/:transferId', async (ctx, next) => {
@@ -30,18 +30,7 @@ const handler = (router, routesContext) => {
             const token = `${check.protectedHeader}.${check.body}.${check.signature}`;
 
             try {
-                for (const pubKey of pubKeys) {
-                    // TODO: Investigate the linting error
-                    // eslint-disable-next-line
-                    JWT.verify(token, pubKey, (err) => {
-                        if (err) {
-                            routesContext.log(`Error verifying JWS token: ${err.stack || util.inspect(err)}`);
-                        } else {
-                            isValidTransfer = true;
-                        }
-                    });
-                    if (isValidTransfer === true) break;
-                }
+                isValidTransfer = pubKeys.some(pubKey => JWT.verify(token, pubKey));
             } catch (err) {
                 routesContext.log(`Error validating JWS token: ${err.stack || util.inspect(err)}`);
             }

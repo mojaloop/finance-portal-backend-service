@@ -19,12 +19,16 @@ const handler = (router, routesContext) => {
     });
 
     router.get('/settlement-windows/:settlementWindowId', async (ctx, next) => {
-        const settlementWindow = await routesContext.db.getSettlementWindowInfo(ctx.params.settlementWindowId);
+        const settlementWindow = await routesContext
+            .db.getSettlementWindowInfo(ctx.params.settlementWindowId);
+
         try {
             const api = new Model({ endpoint: routesContext.config.settlementsEndpoint });
-            const settlement = await api.getSettlements({ settlementWindowId: ctx.params.settlementWindowId });
+            const settlement = await api.getSettlements({
+                settlementWindowId: ctx.params.settlementWindowId,
+            });
             settlementWindow.settlement = (settlement.length === 1 ? settlement[0] : {});
-        } catch(error) {
+        } catch (error) {
             routesContext.log(error);
             settlementWindow.settlement = {};
         }
