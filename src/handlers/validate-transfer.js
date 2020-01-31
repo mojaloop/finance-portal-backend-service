@@ -30,10 +30,7 @@ const handler = (router, routesContext) => {
             const token = `${check.protectedHeader}.${check.body}.${check.signature}`;
 
             try {
-                pubKeys.some((pubKey) => {
-                    isValidTransfer = JWT.verify(token, pubKey);
-                    return isValidTransfer === true;
-                });
+                isValidTransfer = pubKeys.some(pubKey => JWT.verify(token, pubKey));
             } catch (err) {
                 routesContext.log(`Error validating JWS token: ${err.stack || util.inspect(err)}`);
             }
