@@ -580,8 +580,8 @@ module.exports = class Database {
     }
 
     async getCurrentSettlementWindowId() {
-      const thisSettlementWindowId = await this.connection.query(currentSettlementWindowId);
-      return thisSettlementWindowId[0][0].settlementWindowId;
+        const thisSettlementWindowId = await this.connection.query(currentSettlementWindowId);
+        return thisSettlementWindowId[0][0].settlementWindowId;
     }
 
     async getCurrentSettlementWindowInfo(participantId) {

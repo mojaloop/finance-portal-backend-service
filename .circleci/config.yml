@@ -186,6 +186,9 @@ jobs:
           keys:
             - dependency-cache-{{ checksum "src/package.json" }}
       - run:
+          name: Execute linter
+          command: npm run lint
+      - run:
           name: Create dir for test results
           command: cd src && mkdir -p ./test/results
       - run:
