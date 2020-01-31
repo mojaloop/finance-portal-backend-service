@@ -655,6 +655,22 @@ module.exports = {
             participantName: 'payerfsp',
         },
     ],
+    fxpRates: {
+        eurmad: [{
+            rate: 6666667,
+            decimalRate: 4,
+            startTime: '2019-09-03T12:00:00.000Z',
+            endTime: '2019-09-04T12:00:00.000Z',
+            reuse: true,
+        },
+        {
+            rate: 6666680,
+            decimalRate: 4,
+            startTime: '2019-09-04T12:00:00.000Z',
+            endTime: '2019-09-05T12:00:00.000Z',
+            reuse: true,
+        }],
+    },
     limits: {
         XOF: {
             currency: 'XOF',
