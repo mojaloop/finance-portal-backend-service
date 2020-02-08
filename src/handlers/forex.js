@@ -28,6 +28,7 @@ const handler = (router, routesContext) => {
             await createFxpRateForCurrencyChannel(
                 routesContext.config.fxpEndpoint,
                 ctx.params.currencyPair.toLowerCase(),
+                ctx.request.body,
             );
 
             ctx.response.body = null;
