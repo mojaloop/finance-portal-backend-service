@@ -56,7 +56,7 @@ describe('POST /forex/rates/:currencyPair', () => {
             casaLib.admin.api.createFxpRateForCurrencyChannel
                 .mockImplementation(jest.fn(() => { throw new Error('foo'); }));
 
-            const response = await request(server).get('/forex/rates/:currencyPair');
+            const response = await request(server).post('/forex/rates/:currencyPair');
             expect(response.status).toEqual(502);
             expect(response.body).toEqual({ msg: 'FXP API Error' });
         });
@@ -66,9 +66,9 @@ describe('POST /forex/rates/:currencyPair', () => {
             casaLib.admin.api.createFxpRateForCurrencyChannel
                 .mockImplementation(jest.fn(() => Promise.resolve()));
 
-            const response = await request(server).get('/forex/rates/:currencyPair');
+            const response = await request(server).post('/forex/rates/:currencyPair');
             expect(response.status).toEqual(202);
-            expect(response.body).toEqual();
+            expect(response.body).toEqual({});
         });
     });
 });
