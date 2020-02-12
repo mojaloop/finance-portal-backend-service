@@ -390,7 +390,7 @@ SELECT sw.settlementWindowId, swsc.settlementWindowStateId, 0 AS amount, 'N/A' A
 `;
 
 const outAmountQuery = `
-SELECT DISTINCT ssw.settlementWindowId, spc.netAmount AS outAmount, p.name AS fspId, p.participantId
+SELECT DISTINCT ssw.settlementWindowId, pc.currencyId as currency, spc.netAmount AS outAmount, p.name AS fspId, p.participantId
  FROM settlement
  INNER JOIN settlementSettlementWindow AS ssw ON ssw.settlementId = settlement.settlementId
  INNER JOIN settlementWindow AS sw ON sw.settlementWindowId = ssw.settlementWindowId
@@ -405,7 +405,7 @@ SELECT DISTINCT ssw.settlementWindowId, spc.netAmount AS outAmount, p.name AS fs
 `;
 
 const inAmountQuery = `
-SELECT DISTINCT ssw.settlementWindowId, spc.netAmount AS inAmount, p.name AS fspId, p.participantId
+SELECT DISTINCT ssw.settlementWindowId, pc.currencyId as currency, spc.netAmount AS inAmount, p.name AS fspId, p.participantId
  FROM settlement
  INNER JOIN settlementSettlementWindow AS ssw ON ssw.settlementId = settlement.settlementId
  INNER JOIN settlementWindow AS sw ON sw.settlementWindowId = ssw.settlementWindowId
@@ -420,9 +420,9 @@ SELECT DISTINCT ssw.settlementWindowId, spc.netAmount AS inAmount, p.name AS fsp
 `;
 
 const netAmountQuery = `
-SELECT settlementWindowId, sum(netAmount) AS netAmount, fspId, participantId
+SELECT settlementWindowId, sum(netAmount) AS netAmount, fspId, participantId, currency
 FROM (
-  SELECT DISTINCT ssw.settlementWindowId, spc.netAmount, p.name AS fspId, p.participantId
+  SELECT DISTINCT ssw.settlementWindowId, spc.netAmount, p.name AS fspId, p.participantId, pc.currencyId as currency
   FROM settlement
     INNER JOIN settlementSettlementWindow AS ssw ON ssw.settlementId = settlement.settlementId
     INNER JOIN settlementWindow AS sw ON sw.settlementWindowId = ssw.settlementWindowId
@@ -433,7 +433,7 @@ FROM (
     INNER JOIN participantCurrency AS pc ON pc.participantCurrencyId = spc.participantCurrencyId
     INNER JOIN participant AS p ON p.participantId = pc.participantId
   WHERE ssw.settlementWindowId = ? ) AS tab
- GROUP BY settlementWindowId, fspId, participantId
+ GROUP BY settlementWindowId, fspId, participantId, currency
 `;
 
 const settlementSettlementWindowQuery = `
@@ -799,6 +799,7 @@ module.exports = class Database {
             const obj = {
                 fspId: element.fspId,
                 inAmount: inValue,
+                currency: element.currency,
                 outAmount: outValue,
                 netAmount: element.netAmount,
             };
