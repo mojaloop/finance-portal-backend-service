@@ -491,7 +491,7 @@ SELECT
     ANY_VALUE(settlementWindowStateId) AS 'state',
     ANY_VALUE(settlementWindowReason) AS 'reason',
     ANY_VALUE(createdDate) AS 'settlementWindowOpen',
-    ANY_VALUE(settlementWindowClose),
+    ANY_VALUE(settlementWindowClose) AS 'settlementWindowClose',
     sum(accountAmount) AS 'amount',
     accountCurrency AS 'currency'
 FROM
@@ -805,11 +805,24 @@ module.exports = class Database {
             };
             participantAmount.push(obj);
         });
-
+        const totalAmounts = participantAmount.reduce((total, participantAmnt) => {
+          if (Object.keys(total).length === 0 ) {
+            total[participantAmnt.currency] = parseFloat(participantAmnt.outAmount);
+            return total;
+          }
+          Object.keys(total).includes(participantAmnt.currency) 
+            ? total[participantAmnt.currency] += parseFloat(participantAmnt.outAmount)
+            : total[participantAmnt.currency] = parseFloat(participantAmnt.outAmount);
+          return total;
+        }, {});
+        const sumTotalAmount = Object.keys(totalAmounts).map(currency => {
+          return {[currency]: totalAmounts[currency].toFixed(4).toString()}
+        });
         const result = settlementWindow.filter(n => n.settlementWindowId !== null);
         return {
             settlementWindow: (result.length === 1 ? result[0] : {}),
             participantAmount,
+            totalAmount: sumTotalAmount,
             settlementId,
             relatedSettlementWindows,
         };
