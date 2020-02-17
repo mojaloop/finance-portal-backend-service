@@ -28,6 +28,14 @@ cd ./src
 npm install
 ```
 
+## External dependencies
+This service relies on external APIs in order to perform some operations regarding Forex transactions and delegation of the "commit settlement window" action.
+
+These APIs are not part of the Mojaloop core, and their specific implementations and usages are at the discretion of the target deployment.
+Their endpoints are defined by these configuration values:
+* FXP_ENDPOINT
+* EXTERNAL_SETTLEMENTS_ENDPOINT
+
 ## Push to the repo
 Follow the instructions from the Building section above, then:
 ```bash
@@ -44,7 +52,7 @@ make run
 You'll need access to a mysql instance containing some central_ledger data, and a mojaloop deployment.
 
 Copy the `.template.env` file to a `.env` file and change details as appropriate. Note the
-`SETTLEMENTS_ENDPOINT` and `CENTRAL_LEDGER_ENDPOINT` values. Then port forward the central ledger
+`FXP_ENDPOINT`, `EXTERNAL_SETTLEMENTS_ENDPOINT`, `CENTRAL_SETTLEMENTS_ENDPOINT` and `CENTRAL_LEDGER_ENDPOINT` values. Then port forward the central ledger
 and central settlements services as follows, replacing the ports 4000 and 4001 to correspond to the
 values in the `.env` file, and replacing `$whatever` as appropriate for your deployment (you can
 get these values either with tab-completion, or `kubectl get pods`):
