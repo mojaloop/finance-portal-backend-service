@@ -33,7 +33,7 @@ describe('PUT /settlement-window-commit/:settlementWindowId', () => {
                 .put(`/settlement-window-commit/${mockData.settleSettlementWindow.request[3].settlementWindowId}`)
                 .send(mockData.settleSettlementWindow.request[3].body);
             expect(response.status).toEqual(502);
-            expect(response.body).toEqual({ msg: 'TMF API Error' });
+            expect(response.body).toEqual({ msg: 'Settlement API Error' });
         });
 
         test('should return a successful status code in case `getSettlementWindows` fails', async () => {
