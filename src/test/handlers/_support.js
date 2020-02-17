@@ -30,8 +30,8 @@ class Database {
 
 const createDb = () => (new Database());
 
-const createServer = (db, logger = () => {}, database) => http.createServer(
-    appCreateServer(config, db, logger, database).callback(),
+const createServer = (db, logger = () => {}, database, configOverride) => http.createServer(
+    appCreateServer(configOverride || config, db, logger, database).callback(),
 );
 
 module.exports = {

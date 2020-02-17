@@ -43,7 +43,7 @@
   },
   "scripts": {
     "start": "node index.js",
-    "test": "jest --testMatch '**/test/**/*.test.js' --coverage",
+    "test": "jest --ci --testMatch '**/test/**/*.test.js' --coverage",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   }
