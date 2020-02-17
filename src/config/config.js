@@ -43,7 +43,7 @@ const config = {
         644: process.env.HUB_REPORT_URL_644,
     },
     featureFlags: {
-        transferVerification: process.env.FEATURE_FLAG_TRANSFER_VERIFICATION !== 'false',
+        transferVerification: process.env.FEATURE_FLAG_TRANSFER_VERIFICATION === 'true',
     },
 };
 
