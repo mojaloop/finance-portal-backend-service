@@ -1,5 +1,5 @@
 const http = require('http');
-const config = require('../../config/config');
+const globalConfig = require('../../config/config');
 const appCreateServer = require('../../server');
 const mockData = require('./mock-data.js');
 
@@ -30,8 +30,8 @@ class Database {
 
 const createDb = () => (new Database());
 
-const createServer = (db, logger = () => {}, database, configOverride) => http.createServer(
-    appCreateServer(configOverride || config, db, logger, database).callback(),
+const createServer = ({ db, logger = () => {}, database, config = globalConfig } = {}) => http.createServer(
+    appCreateServer(config, db, logger, database).callback(),
 );
 
 module.exports = {
