@@ -21,8 +21,8 @@ const config = {
         listenPort: process.env.LISTEN_PORT,
     },
     fxpEndpoint: process.env.FXP_ENDPOINT,
-    tmfEndpoint: process.env.TMF_ENDPOINT,
-    settlementsEndpoint: process.env.SETTLEMENTS_ENDPOINT,
+    externalSettlementsEndpoint: process.env.EXTERNAL_SETTLEMENTS_ENDPOINT,
+    centralSettlementsEndpoint: process.env.CENTRAL_SETTLEMENTS_ENDPOINT,
     centralLedgerEndpoint: process.env.CENTRAL_LEDGER_ENDPOINT,
     settlementManagementEndpoint: process.env.SETTLEMENT_MANAGEMENT_ENDPOINT,
     auth: {

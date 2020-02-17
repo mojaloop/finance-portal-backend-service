@@ -23,7 +23,7 @@ const handler = (router, routesContext) => {
             .db.getSettlementWindowInfo(ctx.params.settlementWindowId);
 
         try {
-            const api = new Model({ endpoint: routesContext.config.settlementsEndpoint });
+            const api = new Model({ endpoint: routesContext.config.centralSettlementsEndpoint });
             const settlement = await api.getSettlements({
                 settlementWindowId: ctx.params.settlementWindowId,
             });

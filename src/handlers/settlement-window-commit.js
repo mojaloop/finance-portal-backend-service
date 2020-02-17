@@ -11,7 +11,7 @@ const handler = (router, routesContext) => {
 
         try {
             await commitSettlementWindow(
-                routesContext.config.settlementsEndpoint,
+                routesContext.config.externalSettlementsEndpoint,
                 ctx.params.settlementWindowId,
             );
         } catch (error) {
