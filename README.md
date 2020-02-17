@@ -29,7 +29,7 @@ npm install
 ```
 
 ## External dependencies
-This service is relying on external APIs in order to perform some operations regarding ForEx transactions and delegation of the "commit settlement window" action.
+This service relies on external APIs in order to perform some operations regarding Forex transactions and delegation of the "commit settlement window" action.
 
 These APIs are not part of the Mojaloop core and their specific implementation and usage is at the discretion of the target deployment. 
 Their endpoints are defined by these configurations values:
