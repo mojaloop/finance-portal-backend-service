@@ -15,7 +15,7 @@ const handler = (router, routesContext) => {
                 ctx.params.settlementWindowId,
             );
         } catch (error) {
-            routesContext.log('TMF API Error', util.inspect(error, { depth: 10 }));
+            routesContext.log('Settlement API Error', util.inspect(error, { depth: 10 }));
             ctx.response.body = { msg: 'TMF API Error' };
             ctx.response.status = 502;
 
