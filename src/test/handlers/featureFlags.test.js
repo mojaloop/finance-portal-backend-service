@@ -38,6 +38,7 @@ describe('GET /featureflags', () => {
 
         test('should return 200 and values for any additional feature flags when set in config"', async () => {
             const confOverride = JSON.parse(JSON.stringify(config));
+            confOverride.featureFlags.transferVerification = true;
             confOverride.featureFlags.someFlag = true;
             confOverride.featureFlags.someOtherFlag = false;
 
