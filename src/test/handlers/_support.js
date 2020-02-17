@@ -30,7 +30,12 @@ class Database {
 
 const createDb = () => (new Database());
 
-const createServer = ({ db, logger = () => {}, database, config = globalConfig } = {}) => http.createServer(
+const createServer = ({
+    db,
+    logger = () => {},
+    database,
+    config = globalConfig,
+} = {}) => http.createServer(
     appCreateServer(config, db, logger, database).callback(),
 );
 
