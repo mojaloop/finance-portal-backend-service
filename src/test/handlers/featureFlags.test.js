@@ -3,57 +3,55 @@ const globalConfig = require('../../config/config.js');
 const support = require('./_support.js');
 
 describe('GET /featureflags', () => {
-    describe('Failures:', () => {
-        test('should return 200 and false for transferVerification when config is set to "false"', async () => {
-            const config = JSON.parse(JSON.stringify(globalConfig));
-            config.featureFlags.transferVerification = false;
+    test('should return 200 and false for transferVerification when config is set to "false"', async () => {
+        const config = JSON.parse(JSON.stringify(globalConfig));
+        config.featureFlags.transferVerification = false;
 
-            const db = support.createDb();
-            const server = support.createServer({ db, config });
+        const db = support.createDb();
+        const server = support.createServer({ db, config });
 
-            const response = await request(server).get('/featureflags');
-            expect(response.status).toEqual(200);
-            expect(response.body).toEqual({
-                transferVerification: false,
-            });
-
-            server.close();
+        const response = await request(server).get('/featureflags');
+        expect(response.status).toEqual(200);
+        expect(response.body).toEqual({
+            transferVerification: false,
         });
 
-        test('should return 200 and true for transferVerification when config is set to "true"', async () => {
-            const config = JSON.parse(JSON.stringify(globalConfig));
-            config.featureFlags.transferVerification = true;
+        server.close();
+    });
 
-            const db = support.createDb();
-            const server = support.createServer({ db, config });
+    test('should return 200 and true for transferVerification when config is set to "true"', async () => {
+        const config = JSON.parse(JSON.stringify(globalConfig));
+        config.featureFlags.transferVerification = true;
 
-            const response = await request(server).get('/featureflags');
-            expect(response.status).toEqual(200);
-            expect(response.body).toEqual({
-                transferVerification: true,
-            });
+        const db = support.createDb();
+        const server = support.createServer({ db, config });
 
-            server.close();
+        const response = await request(server).get('/featureflags');
+        expect(response.status).toEqual(200);
+        expect(response.body).toEqual({
+            transferVerification: true,
         });
 
-        test('should return 200 and values for any additional feature flags when set in config"', async () => {
-            const config = JSON.parse(JSON.stringify(globalConfig));
-            config.featureFlags.transferVerification = true;
-            config.featureFlags.someFlag = true;
-            config.featureFlags.someOtherFlag = false;
+        server.close();
+    });
 
-            const db = support.createDb();
-            const server = support.createServer({ db, config });
+    test('should return 200 and values for any additional feature flags when set in config"', async () => {
+        const config = JSON.parse(JSON.stringify(globalConfig));
+        config.featureFlags.transferVerification = true;
+        config.featureFlags.someFlag = true;
+        config.featureFlags.someOtherFlag = false;
 
-            const response = await request(server).get('/featureflags');
-            expect(response.status).toEqual(200);
-            expect(response.body).toEqual({
-                transferVerification: true,
-                someFlag: true,
-                someOtherFlag: false,
-            });
+        const db = support.createDb();
+        const server = support.createServer({ db, config });
 
-            server.close();
+        const response = await request(server).get('/featureflags');
+        expect(response.status).toEqual(200);
+        expect(response.body).toEqual({
+            transferVerification: true,
+            someFlag: true,
+            someOtherFlag: false,
         });
+
+        server.close();
     });
 });
