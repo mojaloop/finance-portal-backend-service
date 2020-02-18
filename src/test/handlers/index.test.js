@@ -1,7 +1,7 @@
 const request = require('supertest');
 const support = require('./_support');
 
-const server = support.createServer(support.createDb());
+const server = support.createServer({ db: support.createDb() });
 
 describe('GET /', () => {
     test('should respond as expected', async () => {

@@ -42,6 +42,9 @@ const config = {
         312: process.env.HUB_REPORT_URL_312,
         644: process.env.HUB_REPORT_URL_644,
     },
+    featureFlags: {
+        transferVerification: process.env.FEATURE_FLAG_TRANSFER_VERIFICATION === 'true',
+    },
 };
 
 module.exports = config;

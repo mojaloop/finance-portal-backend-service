@@ -12,7 +12,7 @@ let db;
 
 beforeEach(async () => {
     db = support.createDb();
-    server = support.createServer(db);
+    server = support.createServer({ db });
 });
 
 afterEach(async () => {
