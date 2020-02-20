@@ -1,5 +1,6 @@
 const portalLib = require('@mojaloop/finance-portal-lib');
 const request = require('supertest');
+const config = require('../../config/config');
 const handlerHelpers = require('../../lib/handlerHelpers');
 const mockData = require('./mock-data');
 const support = require('./_support.js');
@@ -20,7 +21,14 @@ describe('PUT /settlement-window-commit/:settlementWindowId', () => {
     portalLib.admin.api.commitSettlementWindow = jest.fn();
     handlerHelpers.getSettlementWindows = jest.fn();
 
+    const targetSettlementWindowId = mockData.settleSettlementWindow.request[3].settlementWindowId;
+
     afterEach(() => {
+        expect(portalLib.admin.api.commitSettlementWindow.mock.calls[0][0])
+            .toEqual(config.externalSettlementsEndpoint);
+        expect(portalLib.admin.api.commitSettlementWindow.mock.calls[0][1])
+            .toStrictEqual(Number(targetSettlementWindowId));
+
         portalLib.admin.api.commitSettlementWindow.mockClear();
         handlerHelpers.getSettlementWindows.mockClear();
     });
@@ -30,7 +38,7 @@ describe('PUT /settlement-window-commit/:settlementWindowId', () => {
             portalLib.admin.api.commitSettlementWindow.mockImplementation(jest.fn(() => { throw new Error('foo'); }));
 
             const response = await request(server)
-                .put(`/settlement-window-commit/${mockData.settleSettlementWindow.request[3].settlementWindowId}`)
+                .put(`/settlement-window-commit/${targetSettlementWindowId}`)
                 .send(mockData.settleSettlementWindow.request[3].body);
             expect(response.status).toEqual(502);
             expect(response.body).toEqual({ msg: 'Settlement API Error' });
@@ -42,7 +50,7 @@ describe('PUT /settlement-window-commit/:settlementWindowId', () => {
             handlerHelpers.getSettlementWindows.mockImplementation(jest.fn(() => { throw new Error('foo'); }));
 
             const response = await request(server)
-                .put(`/settlement-window-commit/${mockData.settleSettlementWindow.request[3].settlementWindowId}`)
+                .put(`/settlement-window-commit/${targetSettlementWindowId}`)
                 .send(mockData.settleSettlementWindow.request[3].body);
             expect(response.status).toEqual(200);
             expect(response.body).toEqual({});
@@ -59,8 +67,8 @@ describe('PUT /settlement-window-commit/:settlementWindowId', () => {
                 );
 
             const response = await request(server)
-                .put(`/settlement-window-commit/${mockData.settleSettlementWindow.request[3].settlementWindowId}`)
-                .send(mockData.settleSettlementWindow.request[3].body);
+                .put(`/settlement-window-commit/${targetSettlementWindowId}`)
+                .send();
             expect(response.status).toEqual(200);
             expect(response.body).toEqual(mockData.settlementWindowList[0]);
         });

@@ -12,7 +12,7 @@ const handler = (router, routesContext) => {
         try {
             await commitSettlementWindow(
                 routesContext.config.externalSettlementsEndpoint,
-                ctx.params.settlementWindowId,
+                Number(ctx.params.settlementWindowId),
             );
         } catch (error) {
             routesContext.log('Settlement API Error', util.inspect(error, { depth: 10 }));
