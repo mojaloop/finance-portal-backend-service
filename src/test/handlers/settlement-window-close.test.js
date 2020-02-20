@@ -13,10 +13,9 @@ axios.post = jest.fn().mockImplementationOnce(() => Promise.resolve({
 
 let server;
 let db;
-jest.useFakeTimers();
 
 beforeEach(async () => {
-    jest.useFakeTimers();
+    jest.setTimeout(7000);
     db = support.createDb();
     server = support.createServer(db);
 });
@@ -30,10 +29,8 @@ describe('PUT /settlement-window-close/:settlementWindowId', () => {
         const response = await request(server)
             .put(`/settlement-window-close/${mockData.settleSettlementWindow.request[2].settlementWindowId}`);
         expect(response.status).toEqual(200);
-        // const expectedWindowList = mockData.settlementWindowList;
-        // expect(response.body).toEqual(expectedWindowList);
-        expect(setTimeout).toHaveBeenCalledTimes(1);
-        expect(setTimeout).toHaveBeenLastCalledWith(expect.any(Function), 3000);
+        const expectedWindowList = mockData.settlementWindowList;
+        expect(response.body).toEqual(expectedWindowList);
     });
 
     test('should return status code 502 if fails to close the window because the settlement endpoint responds non 202 status', async () => {
@@ -41,10 +38,8 @@ describe('PUT /settlement-window-close/:settlementWindowId', () => {
             .put(`/settlement-window-close/${mockData.settleSettlementWindow.request[2].settlementWindowId}`)
             .send(mockData.settleSettlementWindow.request[2].body);
         expect(response.status).toEqual(502);
-        // const expectedWindowList = mockData.settlementWindowList;
-        // expect(response.body).toEqual(expectedWindowList);
-        expect(setTimeout).toHaveBeenCalledTimes(1);
-        expect(setTimeout).toHaveBeenLastCalledWith(expect.any(Function), 3000);
+        const expectedWindowList = mockData.settlementWindowList;
+        expect(response.body).toEqual(expectedWindowList);
     });
 
     test('should return status code 502 if fails to close the window', async () => {
@@ -52,9 +47,7 @@ describe('PUT /settlement-window-close/:settlementWindowId', () => {
             .put(`/settlement-window-close/${mockData.settleSettlementWindow.request[2].settlementWindowId}`)
             .send(mockData.settleSettlementWindow.request[2].body);
         expect(response.status).toEqual(502);
-        // const expectedWindowList = mockData.settlementWindowList;
-        // expect(response.body).toEqual(expectedWindowList);
-        expect(setTimeout).toHaveBeenCalledTimes(1);
-        expect(setTimeout).toHaveBeenLastCalledWith(expect.any(Function), 3000);
+        const expectedWindowList = mockData.settlementWindowList;
+        expect(response.body).toEqual(expectedWindowList);
     });
 });

@@ -32,7 +32,8 @@
     "mysql2": "1.6.5",
     "node-fetch": "2.6.0",
     "qs": "6.7.0",
-    "rc": "1.2.8"
+    "rc": "1.2.8",
+    "sleep-promise": "8.0.1"
   },
   "devDependencies": {
     "eslint": "5.3.0",

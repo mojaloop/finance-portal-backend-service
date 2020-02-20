@@ -1,4 +1,5 @@
 const axios = require('axios');
+const sleep = require('sleep-promise');
 
 const handlerHelpers = require('../lib/handlerHelpers');
 
@@ -16,14 +17,13 @@ const handler = (router, routesContext) => {
         } catch (err) {
             ctx.response.status = 502;
         } finally {
-            // this setTimeout is introduced to give TMF enough time to close the window
-            setTimeout(async () => {
-                ctx.response.body = await handlerHelpers.getSettlementWindows(
-                    routesContext,
-                    fromDateTime,
-                    toDateTime,
-                );
-            }, 3000);
+            // this sleep is introduced to give TMF enough time to close the window
+            await sleep(3000);
+            ctx.response.body = await handlerHelpers.getSettlementWindows(
+                routesContext,
+                fromDateTime,
+                toDateTime,
+            );
         }
         await next();
     });
