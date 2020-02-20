@@ -6,13 +6,13 @@ const { getSettlementWindows } = require('../lib/handlerHelpers');
 
 const handler = (router, routesContext) => {
     router.put('/settlement-window-commit/:settlementWindowId', async (ctx, next) => {
-        const { startDate, endDate } = ctx.request.body;
+        const { settlementId, startDate, endDate } = ctx.request.body;
         let mostRecentSettlementWindow;
 
         try {
             await commitSettlementWindow(
                 routesContext.config.externalSettlementsEndpoint,
-                ctx.params.settlementWindowId,
+                Number(settlementId),
             );
         } catch (error) {
             routesContext.log('Settlement API Error', util.inspect(error, { depth: 10 }));
