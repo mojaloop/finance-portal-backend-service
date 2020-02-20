@@ -32,20 +32,20 @@ describe('PUT /settlement-window-close/:settlementWindowId', () => {
         expect(response.body).toEqual(expectedWindowList);
     });
 
-    test('should return status code 500 if fails to close the window because the settlement endpoint responds non 202 status', async () => {
+    test('should return status code 502 if fails to close the window because the settlement endpoint responds non 202 status', async () => {
         const response = await request(server)
             .put(`/settlement-window-close/${mockData.settleSettlementWindow.request[2].settlementWindowId}`)
             .send(mockData.settleSettlementWindow.request[2].body);
-        expect(response.status).toEqual(500);
+        expect(response.status).toEqual(502);
         const expectedWindowList = mockData.settlementWindowList;
         expect(response.body).toEqual(expectedWindowList);
     });
 
-    test('should return status code 500 if fails to close the window', async () => {
+    test('should return status code 502 if fails to close the window', async () => {
         const response = await request(server)
             .put(`/settlement-window-close/${mockData.settleSettlementWindow.request[2].settlementWindowId}`)
             .send(mockData.settleSettlementWindow.request[2].body);
-        expect(response.status).toEqual(500);
+        expect(response.status).toEqual(502);
         const expectedWindowList = mockData.settlementWindowList;
         expect(response.body).toEqual(expectedWindowList);
     });

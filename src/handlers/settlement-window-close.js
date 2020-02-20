@@ -11,11 +11,17 @@ const handler = (router, routesContext) => {
             if (resp.status === 202) {
                 ctx.response.status = 200;
             } else {
-                ctx.response.status = 500;
+                ctx.response.status = 502;
             }
         } catch (err) {
-            ctx.response.status = 500;
+            ctx.response.status = 502;
         } finally {
+            // TODO: Remove the duplicate query, this is introduced to give TMF enough time to close the window
+            await handlerHelpers.getSettlementWindows(
+                routesContext,
+                fromDateTime,
+                toDateTime,
+            );
             ctx.response.body = await handlerHelpers.getSettlementWindows(
                 routesContext,
                 fromDateTime,
