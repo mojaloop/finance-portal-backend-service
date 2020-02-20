@@ -16,17 +16,14 @@ const handler = (router, routesContext) => {
         } catch (err) {
             ctx.response.status = 502;
         } finally {
-            // TODO: Remove the duplicate query, this is introduced to give TMF enough time to close the window
-            await handlerHelpers.getSettlementWindows(
-                routesContext,
-                fromDateTime,
-                toDateTime,
-            );
-            ctx.response.body = await handlerHelpers.getSettlementWindows(
-                routesContext,
-                fromDateTime,
-                toDateTime,
-            );
+            // this setTimeout is introduced to give TMF enough time to close the window
+            setTimeout(async () => {
+                ctx.response.body = await handlerHelpers.getSettlementWindows(
+                    routesContext,
+                    fromDateTime,
+                    toDateTime,
+                );
+            }, 3000);
         }
         await next();
     });
