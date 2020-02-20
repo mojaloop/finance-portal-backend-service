@@ -22,12 +22,13 @@ describe('PUT /settlement-window-commit/:settlementWindowId', () => {
     handlerHelpers.getSettlementWindows = jest.fn();
 
     const targetSettlementWindowId = mockData.settleSettlementWindow.request[3].settlementWindowId;
+    const targetBody = mockData.settleSettlementWindow.request[3].body;
 
     afterEach(() => {
         expect(portalLib.admin.api.commitSettlementWindow.mock.calls[0][0])
             .toEqual(config.externalSettlementsEndpoint);
         expect(portalLib.admin.api.commitSettlementWindow.mock.calls[0][1])
-            .toStrictEqual(Number(targetSettlementWindowId));
+            .toStrictEqual(Number(targetBody.settlementId));
 
         portalLib.admin.api.commitSettlementWindow.mockClear();
         handlerHelpers.getSettlementWindows.mockClear();
@@ -39,7 +40,7 @@ describe('PUT /settlement-window-commit/:settlementWindowId', () => {
 
             const response = await request(server)
                 .put(`/settlement-window-commit/${targetSettlementWindowId}`)
-                .send(mockData.settleSettlementWindow.request[3].body);
+                .send(targetBody);
             expect(response.status).toEqual(502);
             expect(response.body).toEqual({ msg: 'Settlement API Error' });
         });
@@ -51,7 +52,7 @@ describe('PUT /settlement-window-commit/:settlementWindowId', () => {
 
             const response = await request(server)
                 .put(`/settlement-window-commit/${targetSettlementWindowId}`)
-                .send(mockData.settleSettlementWindow.request[3].body);
+                .send(targetBody);
             expect(response.status).toEqual(200);
             expect(response.body).toEqual({});
         });
@@ -68,7 +69,7 @@ describe('PUT /settlement-window-commit/:settlementWindowId', () => {
 
             const response = await request(server)
                 .put(`/settlement-window-commit/${targetSettlementWindowId}`)
-                .send();
+                .send(targetBody);
             expect(response.status).toEqual(200);
             expect(response.body).toEqual(mockData.settlementWindowList[0]);
         });
