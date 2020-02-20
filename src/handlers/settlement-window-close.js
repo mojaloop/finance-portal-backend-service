@@ -1,4 +1,5 @@
 const axios = require('axios');
+const sleep = require('sleep-promise');
 
 const handlerHelpers = require('../lib/handlerHelpers');
 
@@ -7,11 +8,17 @@ const handler = (router, routesContext) => {
         const { startDate: fromDateTime, endDate: toDateTime } = ctx.request.body;
 
         try {
-            await axios.post(`${routesContext.config.settlementManagementEndpoint}/close-window`, {});
-            ctx.response.status = 200;
+            const resp = await axios.post(`${routesContext.config.externalSettlementsEndpoint}/settlement-windows/current/close`, {});
+            if (resp.status === 202) {
+                ctx.response.status = 200;
+            } else {
+                ctx.response.status = 502;
+            }
         } catch (err) {
-            ctx.response.status = 500;
+            ctx.response.status = 502;
         } finally {
+            // this sleep is introduced to give TMF enough time to close the window
+            await sleep(3000);
             ctx.response.body = await handlerHelpers.getSettlementWindows(
                 routesContext,
                 fromDateTime,
