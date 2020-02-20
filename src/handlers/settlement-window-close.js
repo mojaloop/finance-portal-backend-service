@@ -7,8 +7,12 @@ const handler = (router, routesContext) => {
         const { startDate: fromDateTime, endDate: toDateTime } = ctx.request.body;
 
         try {
-            await axios.post(`${routesContext.config.settlementManagementEndpoint}/close-window`, {});
-            ctx.response.status = 200;
+            const resp = await axios.post(`${routesContext.config.externalSettlementsEndpoint}/tmf/settlement-windows/current/close`, {});
+            if (resp.status === 202) {
+                ctx.response.status = 200;
+            } else {
+                ctx.response.status = 500;
+            }
         } catch (err) {
             ctx.response.status = 500;
         } finally {

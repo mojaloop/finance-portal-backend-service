@@ -4,8 +4,12 @@ const mockData = require('./mock-data');
 const support = require('./_support');
 
 axios.post = jest.fn().mockImplementationOnce(() => Promise.resolve({
-    staus: 200, statusText: 'OK', ok: true,
-})).mockImplementationOnce(() => Promise.reject(new Error('Error')));
+    status: 202, statusText: 'OK', ok: true,
+}))
+    .mockImplementationOnce(() => Promise.resolve({
+        status: 403, statusText: 'FORBIDDEN', ok: false,
+    }))
+    .mockImplementationOnce(() => Promise.reject(new Error('Error')));
 
 let server;
 let db;
@@ -24,6 +28,15 @@ describe('PUT /settlement-window-close/:settlementWindowId', () => {
         const response = await request(server)
             .put(`/settlement-window-close/${mockData.settleSettlementWindow.request[2].settlementWindowId}`);
         expect(response.status).toEqual(200);
+        const expectedWindowList = mockData.settlementWindowList;
+        expect(response.body).toEqual(expectedWindowList);
+    });
+
+    test('should return status code 500 if fails to close the window because the settlement endpoint responds non 202 status', async () => {
+        const response = await request(server)
+            .put(`/settlement-window-close/${mockData.settleSettlementWindow.request[2].settlementWindowId}`)
+            .send(mockData.settleSettlementWindow.request[2].body);
+        expect(response.status).toEqual(500);
         const expectedWindowList = mockData.settlementWindowList;
         expect(response.body).toEqual(expectedWindowList);
     });
