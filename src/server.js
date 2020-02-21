@@ -23,22 +23,48 @@ const createServer = (config, db, log, Database) => {
     //
     // Pre-route-handler middleware
     //
+
+    // Log all requests
+    app.use(async (ctx, next) => {
+        log(`Received: ${ctx.request.method} ${ctx.request.path}${ctx.request.search}`);
+        await next();
+        const pretty = obj => JSON.stringify(obj, null, 2);
+        const msg = (
+            'Handled request:\n'
+              + `${ctx.request.method} ${ctx.request.path}${ctx.request.search}\n`
+              + `${pretty(ctx.request.headers)}\n`
+              + `${pretty(ctx.request.body)}\n`
+              + `Response: HTTP ${ctx.response.status}\n`
+              + `${pretty(ctx.response.headers)}\n`
+              + `${pretty(ctx.response.body)}`
+        ).replace(/\n/g, '\n  ');
+        log(msg);
+    });
+
+    // Allow any origin by echoing the origin back to the client
+    // TODO: we should remove this in production and use k8s to route the responses such that the
+    // root serves the UI and all non-root requests serve the API.
+    if (config.cors.reflectOrigin) {
+        app.use(async (ctx, next) => {
+            await next();
+            if (undefined !== ctx.request.headers.origin) {
+                ctx.response.set({
+                    'Access-Control-Allow-Origin': ctx.request.headers.origin,
+                    'Access-Control-Allow-Credentials': true,
+                });
+            }
+        });
+    }
+
     // Return 500 for any unhandled errors
     app.use(async (ctx, next) => {
         try {
             await next();
         } catch (err) {
-            log('Error', util.inspect(err, { depth: 10 }));
+            log('Unhandled error', util.inspect(err, { depth: 10 }));
             ctx.response.status = 500;
             ctx.response.body = { msg: 'Unhandled Internal Error' };
         }
-        log(`${ctx.request.method} ${ctx.request.path} | ${ctx.response.status}`);
-    });
-
-    // Log all requests
-    app.use(async (ctx, next) => {
-        log(`${ctx.request.method} ${ctx.request.path}${ctx.request.search}`);
-        await next();
     });
 
     // Health-check
@@ -155,24 +181,6 @@ const createServer = (config, db, log, Database) => {
     };
 
     mountRoutes();
-
-    //
-    // Post-route-handler processing
-    //
-    // Allow any origin by echoing the origin back to the client
-    // TODO: we should remove this in production and use k8s to route the responses such that the
-    // root serves the UI and all non-root requests serve the API.
-    if (config.cors.reflectOrigin) {
-        app.use(async (ctx, next) => {
-            if (undefined !== ctx.request.headers.origin) {
-                ctx.response.set({
-                    'Access-Control-Allow-Origin': ctx.request.headers.origin,
-                    'Access-Control-Allow-Credentials': true,
-                });
-            }
-            await next();
-        });
-    }
 
     return app;
 };
