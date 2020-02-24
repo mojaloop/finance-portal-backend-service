@@ -31,8 +31,7 @@ const handler = (router, routesContext) => {
                 ctx.request.body,
             );
 
-            ctx.response.body = null;
-            ctx.response.status = 202;
+            ctx.response.status = 204;
 
             await next();
         } catch (error) {
