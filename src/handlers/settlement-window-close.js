@@ -17,7 +17,10 @@ const handler = (router, routesContext) => {
         } catch (err) {
             ctx.response.status = 502;
         } finally {
-            // this sleep is introduced to give TMF enough time to close the window
+            // this delay is introduced in order to give the external settlement API enough time
+            // to close the window
+            // TODO revise the implementation of the external settlement API so it sends back an
+            //  acknowledgment somehow
             await sleep(3000);
             ctx.response.body = await handlerHelpers.getSettlementWindows(
                 routesContext,

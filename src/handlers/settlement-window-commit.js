@@ -1,5 +1,6 @@
 const portalLib = require('@mojaloop/finance-portal-lib');
 const util = require('util');
+const sleep = require('sleep-promise');
 
 const { commitSettlementWindow } = portalLib.admin.api;
 const { getSettlementWindows } = require('../lib/handlerHelpers');
@@ -37,6 +38,11 @@ const handler = (router, routesContext) => {
             routesContext.log(`An error occurred during getSettlementWindow: ${error.message}`);
         }
 
+        // this delay is introduced in order to give the external settlement API enough time
+        // to settle the window
+        // TODO revise the implementation of the external settlement API so it sends back an
+        //  acknowledgment somehow
+        await sleep(3000);
         ctx.response.body = mostRecentSettlementWindow || {};
         ctx.response.status = 200;
         await next();
