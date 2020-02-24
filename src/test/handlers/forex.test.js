@@ -67,7 +67,8 @@ describe('POST /forex/rates/:currencyPair', () => {
                 .mockImplementation(jest.fn(() => Promise.resolve()));
 
             const response = await request(server).post('/forex/rates/:currencyPair');
-            expect(response.status).toEqual(202);
+            expect(response.status).toEqual(204);
+            expect(response.text).toEqual('');
             expect(response.body).toEqual({});
         });
     });
