@@ -9,7 +9,7 @@ const handler = (router, routesContext) => {
             fromDateTime = routesContext.db.MYSQL_MIN_DATETIME, toDateTime =
             routesContext.db.MYSQL_MAX_DATETIME,
         } = qs.parse(ctx.request.querystring);
-        const api = new Model({ endpoint: routesContext.config.settlementsEndpoint });
+        const api = new Model({ endpoint: routesContext.config.centralSettlementsEndpoint });
         ctx.response.body = await api.getSettlements({ fromDateTime, toDateTime });
         ctx.response.status = 200;
         await next();
@@ -18,7 +18,7 @@ const handler = (router, routesContext) => {
     router.put('/settlements/:settlementId', async (ctx, next) => {
         const { startDate: fromDateTime, endDate: toDateTime } = ctx.request.body;
 
-        const api = new Model({ endpoint: routesContext.config.settlementsEndpoint });
+        const api = new Model({ endpoint: routesContext.config.centralSettlementsEndpoint });
 
         const filterParticipants = (ps, f) => ps
             .filter(p => p.accounts.findIndex(a => f(a.netSettlementAmount.amount)) !== -1)
@@ -63,7 +63,7 @@ const handler = (router, routesContext) => {
             fromDateTime = routesContext.db.MYSQL_MIN_DATETIME, toDateTime =
             routesContext.db.MYSQL_MAX_DATETIME,
         } = qs.parse(ctx.request.querystring);
-        const api = new Model({ endpoint: routesContext.config.settlementsEndpoint });
+        const api = new Model({ endpoint: routesContext.config.centralSettlementsEndpoint });
         const settlements = await api.getSettlements({ fromDateTime, toDateTime });
         ctx.response.body = settlements
             .filter(s => s.participants.some(p => p.id === parseInt(ctx.params.participantId, 10)));
