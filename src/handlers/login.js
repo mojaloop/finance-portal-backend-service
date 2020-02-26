@@ -9,7 +9,7 @@ const selfSignedAgent = new https.Agent({ rejectUnauthorized: false });
 // TODO: set the Max-Age directive corresponding to the token expiry time.
 const cookieDirectives = (token, insecure) => insecure
     ? `token=${token};`
-    : `token=${token}; HttpOnly; SameSite=strict; Secure'`
+    : `token=${token}; HttpOnly; SameSite=strict; Secure`
 
 const handler = (router, routesContext) => {
     router.post('/login', async (ctx, next) => {
