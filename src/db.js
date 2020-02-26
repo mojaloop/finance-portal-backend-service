@@ -806,18 +806,21 @@ module.exports = class Database {
             participantAmount.push(obj);
         });
         const totalAmounts = participantAmount.reduce((total, participantAmnt) => {
-          if (Object.keys(total).length === 0 ) {
-            total[participantAmnt.currency] = parseFloat(participantAmnt.outAmount);
+            if (Object.keys(total).length === 0) {
+                // eslint-disable-next-line no-param-reassign
+                total[participantAmnt.currency] = parseFloat(participantAmnt.outAmount);
+                return total;
+            }
+            // eslint-disable-next-line no-unused-expressions
+            Object.keys(total).includes(participantAmnt.currency)
+                // eslint-disable-next-line no-param-reassign
+                ? total[participantAmnt.currency] += parseFloat(participantAmnt.outAmount)
+                // eslint-disable-next-line no-param-reassign
+                : total[participantAmnt.currency] = parseFloat(participantAmnt.outAmount);
             return total;
-          }
-          Object.keys(total).includes(participantAmnt.currency) 
-            ? total[participantAmnt.currency] += parseFloat(participantAmnt.outAmount)
-            : total[participantAmnt.currency] = parseFloat(participantAmnt.outAmount);
-          return total;
         }, {});
-        const sumTotalAmount = Object.keys(totalAmounts).map(currency => {
-          return {[currency]: totalAmounts[currency].toFixed(4).toString()}
-        });
+        const sumTotalAmount = Object.keys(totalAmounts)
+            .map(currency => ({ [currency]: totalAmounts[currency].toFixed(4).toString() }));
         const result = settlementWindow.filter(n => n.settlementWindowId !== null);
         return {
             settlementWindow: (result.length === 1 ? result[0] : {}),
