@@ -7,9 +7,9 @@ const qs = require('querystring');
 const selfSignedAgent = new https.Agent({ rejectUnauthorized: false });
 
 // TODO: set the Max-Age directive corresponding to the token expiry time.
-const cookieDirectives = (token, insecure) => insecure
-    ? `token=${token};`
-    : `token=${token}; HttpOnly; SameSite=strict; Secure`
+const cookieDirectives = (token, insecure) => (
+    insecure ? `token=${token};` : `token=${token}; HttpOnly; SameSite=strict; Secure`
+);
 
 const handler = (router, routesContext) => {
     router.post('/login', async (ctx, next) => {
@@ -19,7 +19,7 @@ const handler = (router, routesContext) => {
                 expiresIn: '3600',
             };
             ctx.response.set({
-                'Set-Cookie': cookieDirectives('bypassed', routesContext.config.insecureCookie)
+                'Set-Cookie': cookieDirectives('bypassed', routesContext.config.insecureCookie),
             });
             ctx.response.status = 200;
             await next();
@@ -54,7 +54,7 @@ const handler = (router, routesContext) => {
             expiresIn: oauth2Token.expires_in,
         };
         ctx.response.set({
-            'Set-Cookie': cookieDirectives(oauth2Token.access_token, routesContext.config.insecureCookie)
+            'Set-Cookie': cookieDirectives(oauth2Token.access_token, routesContext.config.insecureCookie),
         });
         ctx.response.status = 200;
 
