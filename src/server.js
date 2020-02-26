@@ -106,19 +106,19 @@ const createServer = (config, db, log, Database) => {
     // TODO: authorise before handling CORS?
     app.use(async (ctx, next) => {
         if (ctx.request.path.split('/').pop() === 'login' && ctx.request.method.toLowerCase() === 'post') {
-            log('bypassing validation on login request');
+            log('login request received - user will authenticate with login credentials - token validation not performed');
             await next();
             return;
         }
         if (config.auth.bypass) {
-            log('request validation bypassed');
+            log('request token validation bypassed as per config');
             await next();
             return;
         }
 
         const token = ctx.request.get('Cookie').split('=').splice(1).join('');
 
-        log('validating request, token:', token);
+        log('validating request token:', token);
         const opts = {
             method: 'POST',
             headers: {
