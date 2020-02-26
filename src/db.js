@@ -806,18 +806,16 @@ module.exports = class Database {
             participantAmount.push(obj);
         });
         const totalAmounts = participantAmount.reduce((total, participantAmnt) => {
+            const amounts = total;
             if (Object.keys(total).length === 0) {
-                // eslint-disable-next-line no-param-reassign
-                total[participantAmnt.currency] = parseFloat(participantAmnt.outAmount);
-                return total;
+                amounts[participantAmnt.currency] = parseFloat(participantAmnt.outAmount);
+                return amounts;
             }
-            // eslint-disable-next-line no-unused-expressions
-            Object.keys(total).includes(participantAmnt.currency)
-                // eslint-disable-next-line no-param-reassign
-                ? total[participantAmnt.currency] += parseFloat(participantAmnt.outAmount)
-                // eslint-disable-next-line no-param-reassign
-                : total[participantAmnt.currency] = parseFloat(participantAmnt.outAmount);
-            return total;
+            amounts[participantAmnt.currency] = Object.keys(total)
+                .includes(participantAmnt.currency)
+                ? amounts[participantAmnt.currency] + parseFloat(participantAmnt.outAmount)
+                : parseFloat(participantAmnt.outAmount);
+            return amounts;
         }, {});
         const sumTotalAmount = Object.keys(totalAmounts)
             .map(currency => ({ [currency]: totalAmounts[currency].toFixed(4).toString() }));
