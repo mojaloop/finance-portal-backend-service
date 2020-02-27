@@ -1,4 +1,5 @@
 const mysql = require('mysql2');
+const { sumAllParticipants, convertParticipantsAmountsToStrings } = require('./lib/dbHelpers');
 
 const MYSQL_MIN_DATETIME = '1000-01-01';
 const MYSQL_MAX_DATETIME = '9999-12-31';
@@ -390,7 +391,7 @@ SELECT sw.settlementWindowId, swsc.settlementWindowStateId, 0 AS amount, 'N/A' A
 `;
 
 const outAmountQuery = `
-SELECT DISTINCT ssw.settlementWindowId, spc.netAmount AS outAmount, p.name AS fspId, p.participantId
+SELECT DISTINCT ssw.settlementWindowId, pc.currencyId as currency, spc.netAmount AS outAmount, p.name AS fspId, p.participantId
  FROM settlement
  INNER JOIN settlementSettlementWindow AS ssw ON ssw.settlementId = settlement.settlementId
  INNER JOIN settlementWindow AS sw ON sw.settlementWindowId = ssw.settlementWindowId
@@ -405,7 +406,7 @@ SELECT DISTINCT ssw.settlementWindowId, spc.netAmount AS outAmount, p.name AS fs
 `;
 
 const inAmountQuery = `
-SELECT DISTINCT ssw.settlementWindowId, spc.netAmount AS inAmount, p.name AS fspId, p.participantId
+SELECT DISTINCT ssw.settlementWindowId, pc.currencyId as currency, spc.netAmount AS inAmount, p.name AS fspId, p.participantId
  FROM settlement
  INNER JOIN settlementSettlementWindow AS ssw ON ssw.settlementId = settlement.settlementId
  INNER JOIN settlementWindow AS sw ON sw.settlementWindowId = ssw.settlementWindowId
@@ -420,9 +421,9 @@ SELECT DISTINCT ssw.settlementWindowId, spc.netAmount AS inAmount, p.name AS fsp
 `;
 
 const netAmountQuery = `
-SELECT settlementWindowId, sum(netAmount) AS netAmount, fspId, participantId
+SELECT settlementWindowId, sum(netAmount) AS netAmount, fspId, participantId, currency
 FROM (
-  SELECT DISTINCT ssw.settlementWindowId, spc.netAmount, p.name AS fspId, p.participantId
+  SELECT DISTINCT ssw.settlementWindowId, spc.netAmount, p.name AS fspId, p.participantId, pc.currencyId as currency
   FROM settlement
     INNER JOIN settlementSettlementWindow AS ssw ON ssw.settlementId = settlement.settlementId
     INNER JOIN settlementWindow AS sw ON sw.settlementWindowId = ssw.settlementWindowId
@@ -433,7 +434,7 @@ FROM (
     INNER JOIN participantCurrency AS pc ON pc.participantCurrencyId = spc.participantCurrencyId
     INNER JOIN participant AS p ON p.participantId = pc.participantId
   WHERE ssw.settlementWindowId = ? ) AS tab
- GROUP BY settlementWindowId, fspId, participantId
+ GROUP BY settlementWindowId, fspId, participantId, currency
 `;
 
 const settlementSettlementWindowQuery = `
@@ -491,7 +492,7 @@ SELECT
     ANY_VALUE(settlementWindowStateId) AS 'state',
     ANY_VALUE(settlementWindowReason) AS 'reason',
     ANY_VALUE(createdDate) AS 'settlementWindowOpen',
-    ANY_VALUE(settlementWindowClose),
+    ANY_VALUE(settlementWindowClose) AS 'settlementWindowClose',
     sum(accountAmount) AS 'amount',
     accountCurrency AS 'currency'
 FROM
@@ -799,16 +800,19 @@ module.exports = class Database {
             const obj = {
                 fspId: element.fspId,
                 inAmount: inValue,
+                currency: element.currency,
                 outAmount: outValue,
                 netAmount: element.netAmount,
             };
             participantAmount.push(obj);
         });
-
+        const totalAmounts = sumAllParticipants(participantAmount);
+        const sumTotalAmount = convertParticipantsAmountsToStrings(totalAmounts);
         const result = settlementWindow.filter(n => n.settlementWindowId !== null);
         return {
             settlementWindow: (result.length === 1 ? result[0] : {}),
             participantAmount,
+            totalAmount: sumTotalAmount,
             settlementId,
             relatedSettlementWindows,
         };
