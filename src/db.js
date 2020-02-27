@@ -1,4 +1,5 @@
 const mysql = require('mysql2');
+const { sumAllParticipants, convertParticipantsAmountsToStrings } = require('./lib/dbHelpers');
 
 const MYSQL_MIN_DATETIME = '1000-01-01';
 const MYSQL_MAX_DATETIME = '9999-12-31';
@@ -805,20 +806,8 @@ module.exports = class Database {
             };
             participantAmount.push(obj);
         });
-        const totalAmounts = participantAmount.reduce((total, participantAmnt) => {
-            const amounts = total;
-            if (Object.keys(total).length === 0) {
-                amounts[participantAmnt.currency] = parseFloat(participantAmnt.outAmount);
-                return amounts;
-            }
-            amounts[participantAmnt.currency] = Object.keys(total)
-                .includes(participantAmnt.currency)
-                ? amounts[participantAmnt.currency] + parseFloat(participantAmnt.outAmount)
-                : parseFloat(participantAmnt.outAmount);
-            return amounts;
-        }, {});
-        const sumTotalAmount = Object.keys(totalAmounts)
-            .map(currency => ({ [currency]: totalAmounts[currency].toFixed(4).toString() }));
+        const totalAmounts = sumAllParticipants(participantAmount);
+        const sumTotalAmount = convertParticipantsAmountsToStrings(totalAmounts);
         const result = settlementWindow.filter(n => n.settlementWindowId !== null);
         return {
             settlementWindow: (result.length === 1 ? result[0] : {}),
