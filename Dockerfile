@@ -1,4 +1,4 @@
-FROM node:8.11.3-alpine AS builder
+FROM node:12.16.1-alpine AS builder
 WORKDIR /opt/finance-portal-backend-service
 
 RUN apk add --no-cache -t build-dependencies git make gcc g++ python libtool autoconf automake \
@@ -9,7 +9,7 @@ RUN apk add --no-cache -t build-dependencies git make gcc g++ python libtool aut
 COPY ./src/package.json ./src/package-lock.json /opt/finance-portal-backend-service/
 RUN npm install
 
-FROM node:8.11.3-alpine
+FROM node:12.16.1-alpine
 WORKDIR /opt/finance-portal-backend-service
 
 COPY --from=builder /opt/finance-portal-backend-service /opt/finance-portal-backend-service
