@@ -45,6 +45,41 @@ const config = {
     featureFlags: {
         transferVerification: process.env.FEATURE_FLAG_TRANSFER_VERIFICATION === 'true',
     },
+    azureLog: {
+        authTokenEndpoint: process.env.AZURE_AUTH_TOKEN_ENDPOINT,
+        cleanMessageReplacePatterns: [
+            {
+                pattern: '\\\\"',
+                attributes: 'g',
+                replace: '"',
+            },
+            {
+                pattern: '\\\\\\\\"',
+                attributes: 'g',
+                replace: '\\"',
+            },
+        ],
+        cleanSignatureReplacePatterns: [
+            {
+                pattern: '\\\\\\\\"',
+                attributes: 'g',
+                replace: '"',
+            },
+        ],
+        clientId: process.env.AZURE_CLIENT_ID,
+        clientSecret: process.env.AZURE_CLIENT_SECRET,
+        grantType: process.env.AZURE_GRANT_TYPE,
+        kafkaMessagePattern: process.env.AZURE_KAFKA_MESSAGE_PATTERN,
+        logApiEndpoint: process.env.AZURE_LOG_API_ENDPOINT,
+        redirectUri: process.env.AZURE_REDIRECT_URI,
+        resource: process.env.AZURE_RESOURCE,
+        searchQueryTemplate: {
+            regex: process.env.AZURE_SEARCH_QUERY_REGEX,
+            template: process.env.AZURE_SEARCH_QUERY_TEMPLATE,
+        },
+        tenantId: process.env.AZURE_TENANT_ID,
+        workspaceId: process.env.AZURE_WORKSPACE_ID,
+    },
 };
 
 module.exports = config;

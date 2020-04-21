@@ -3,7 +3,7 @@ const fs = require('fs');
 const JWT = require('jsonwebtoken');
 const util = require('util');
 
-const AzureLog = require('../lib/azureLog');
+const AzureLog = require('../lib/azureLogUtil');
 
 const dir = './secrets';
 const pubKeys = fs.readdirSync(dir)
@@ -13,10 +13,10 @@ const pubKeys = fs.readdirSync(dir)
 const handler = (router, routesContext) => {
     router.get('/validate-transfer/:transferId', async (ctx, next) => {
         const transfer = await routesContext.db.getTransferDetails(ctx.params.transferId);
-        // const validMessage = await AzureLog
-        //     .getTransferMessageWithJWSSignature('c83a38ec-c572-4639-bddf-7289656ac99d');
         const validMessage = await AzureLog
-            .getTransferMessageWithJWSSignature(ctx.params.transferId);
+            .getTransferMessageWithJWSSignature(routesContext.config.azureLog,
+                ctx.params.transferId,
+                routesContext.log);
         let isValidTransfer = false;
 
         if (validMessage != null) {

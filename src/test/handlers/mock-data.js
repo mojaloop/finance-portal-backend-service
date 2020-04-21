@@ -911,4 +911,19 @@ module.exports = {
             state: 'CLOSED',
         },
     ],
+    transferId: 'b5c00b61-0dc6-4690-a688-9fc15686d930',
+    transferMessage: {
+        message: {
+            content: {
+                payload: '',
+            },
+        },
+        signatureHeader: {
+            signature: '',
+            protectedHeader: '',
+        },
+    },
+    transferDetails: {
+        foo: 'bar',
+    },
 };
