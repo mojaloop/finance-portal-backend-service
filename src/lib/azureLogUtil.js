@@ -53,7 +53,7 @@ const getTransferMessageWithJWSSignature = async (config, transferId, log) => {
         logger: log,
     };
 
-    const result = portalLib.requests.post(url, body, opts);
+    const result = await portalLib.requests.post(url, body, opts);
     const tables = result && result.tables;
     const rows = tables && tables[0].rows;
     const data = rows && rows[0] && rows[0][0];
