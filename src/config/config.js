@@ -46,20 +46,7 @@ const config = {
         transferVerification: process.env.FEATURE_FLAG_TRANSFER_VERIFICATION === 'true',
     },
     azureLog: {
-        tenantId: process.env.AZURE_TENANT_ID,
-        grantType: process.env.AZURE_GRANT_TYPE,
-        clientId: process.env.AZURE_CLIENT_ID,
-        clientSecret: process.env.AZURE_CLIENT_SECRET,
-        redirectUri: process.env.AZURE_REDIRECT_URI,
-        resource: process.env.AZURE_RESOURCE,
         authTokenEndpoint: process.env.AZURE_AUTH_TOKEN_ENDPOINT,
-        workspaceId: process.env.AZURE_WORKSPACE_ID,
-        logApiEndpoint: process.env.AZURE_LOG_API_ENDPOINT,
-        searchQueryTemplate: {
-            template: process.env.AZURE_SEARCH_QUERY_TEMPLATE,
-            regex: process.env.AZURE_SEARCH_QUERY_REGEX,
-        },
-        kafkaMessagePattern: process.env.AZURE_KAFKA_MESSAGE_PATTERN,
         cleanMessageReplacePatterns: [
             {
                 pattern: '\\\\"',
@@ -79,6 +66,19 @@ const config = {
                 replace: '"',
             },
         ],
+        clientId: process.env.AZURE_CLIENT_ID,
+        clientSecret: process.env.AZURE_CLIENT_SECRET,
+        grantType: process.env.AZURE_GRANT_TYPE,
+        kafkaMessagePattern: process.env.AZURE_KAFKA_MESSAGE_PATTERN,
+        logApiEndpoint: process.env.AZURE_LOG_API_ENDPOINT,
+        redirectUri: process.env.AZURE_REDIRECT_URI,
+        resource: process.env.AZURE_RESOURCE,
+        searchQueryTemplate: {
+            regex: process.env.AZURE_SEARCH_QUERY_REGEX,
+            template: process.env.AZURE_SEARCH_QUERY_TEMPLATE,
+        },
+        tenantId: process.env.AZURE_TENANT_ID,
+        workspaceId: process.env.AZURE_WORKSPACE_ID,
     },
 };
 
