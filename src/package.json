@@ -41,6 +41,7 @@
     "eslint-plugin-import": "2.17.2",
     "jest": "25.1.0",
     "npm-audit-resolver": "2.2.0",
+    "rewire": "^5.0.0",
     "supertest": "4.0.2"
   },
   "scripts": {

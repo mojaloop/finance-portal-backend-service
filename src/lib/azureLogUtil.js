@@ -1,7 +1,14 @@
 const Mustache = require('mustache');
 const portalLib = require('@mojaloop/finance-portal-lib');
 
-const getSearchQuery = (config, transferId, log) => {
+/**
+ * @function getSearchQuery
+ * @param {Object} config Azure configuration parameters.
+ * @param {String} transferId Id of the target transfer.
+ * @param {Object} log logging module used by the system.
+ * @returns {String}
+ */
+function getSearchQuery(config, transferId, log) {
     try {
         return Mustache.render(config.searchQueryTemplate.template, { transferId });
     } catch (e) {
@@ -9,15 +16,16 @@ const getSearchQuery = (config, transferId, log) => {
 
         throw e;
     }
-};
+}
 
 /**
  * @function getClientCredentialToken
- *
- * @returns {String} Access Token to access the Azure Log Analytics REST API resource.
+ * @param {Object} config Azure configuration parameters.
+ * @param {Object} log logging module used by the system.
+ * @returns {String} Access token required to access the Azure Log Analytics REST API resource.
  */
-const getClientCredentialToken = async (config, log) => {
-    const url = portalLib.buildUrl(config.tenantId, 'oauth2', 'token');
+async function getClientCredentialToken(config, log) {
+    const url = portalLib.requests.buildUrl(config.tenantId, 'oauth2', 'token');
     const body = `grant_type=${config.grantType}&client_id=${config.clientId}&redirect_uri=${config.redirectURI}&resource=${config.resource}&client_secret=${config.clientSecret}`;
     const opts = {
         headers: { 'content-type': 'application/x-www-form-urlencoded' },
@@ -29,12 +37,12 @@ const getClientCredentialToken = async (config, log) => {
     const result = await portalLib.requests.post(url, body, opts);
 
     return result && result.access_token ? result.access_token : null;
-};
+}
 
 /**
  * @function getTransferMessageWithJWSSignature
  * @param {Object} config Azure configuration parameters.
- * @param {String} transferId Id of the transfer.
+ * @param {String} transferId Id of the target transfer.
  * @param {Object} log logging module used by the system.
  * @returns {String} the JWS signature for a given transferId.
  */
@@ -65,6 +73,10 @@ const getTransferMessageWithJWSSignature = async (config, transferId, log) => {
     const messagePattern = new RegExp(config.kafkaMessagePattern);
     const match = data.match(messagePattern);
     let cleanMessage = match[1];
+
+    if (!cleanMessage) {
+        return null;
+    }
 
     config.cleanMessageReplacePatterns.forEach((item) => {
         const re = new RegExp(item.pattern, item.attributes);
