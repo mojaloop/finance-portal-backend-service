@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 const rewire = require('rewire');
 
 const azureLogUtil = rewire('../../../lib/azureLogUtil');
