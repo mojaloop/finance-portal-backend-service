@@ -52,7 +52,7 @@ describe('azureLogUtil:', () => {
                     portalLib
                         .requests
                         .post
-                        .mockImplementation(jest.fn(() => { throw fakeError }));
+                        .mockImplementation(jest.fn(() => { throw fakeError; }));
 
                     await expect(
                         azureLogUtil.getTransferMessageWithJWSSignature(config),
