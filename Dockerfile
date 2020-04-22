@@ -15,4 +15,6 @@ WORKDIR /opt/finance-portal-backend-service
 COPY --from=builder /opt/finance-portal-backend-service /opt/finance-portal-backend-service
 COPY ./src /opt/finance-portal-backend-service
 
+RUN npm prune --production
+
 CMD ["node", "/opt/finance-portal-backend-service/index.js"]
