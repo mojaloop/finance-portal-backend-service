@@ -391,33 +391,29 @@ SELECT sw.settlementWindowId, swsc.settlementWindowStateId, 0 AS amount, 'N/A' A
 `;
 
 const outAmountQuery = `
-SELECT DISTINCT ssw.settlementWindowId, pc.currencyId as currency, spc.netAmount AS outAmount, p.name AS fspId, p.participantId
+SELECT DISTINCT ssw.settlementWindowId, pc.currencyId as currency, stp.amount AS outAmount, p.name AS fspId, p.participantId
  FROM settlement
  INNER JOIN settlementSettlementWindow AS ssw ON ssw.settlementId = settlement.settlementId
  INNER JOIN settlementWindow AS sw ON sw.settlementWindowId = ssw.settlementWindowId
  INNER JOIN settlementTransferParticipant AS stp ON stp.settlementId = settlement.settlementId
         AND stp.settlementWindowId = sw.settlementWindowId
- INNER JOIN settlementParticipantCurrency AS spc ON spc.settlementId = stp.settlementId
-    AND  spc.participantCurrencyId  = stp.participantCurrencyId
- INNER JOIN participantCurrency AS pc ON pc.participantCurrencyId = spc.participantCurrencyId
+ INNER JOIN participantCurrency AS pc ON pc.participantCurrencyId = stp.participantCurrencyId
  INNER JOIN participant AS p ON p.participantId = pc.participantId
  WHERE ssw.settlementWindowId = ?
- AND spc.netAmount > 0
+ AND stp.amount > 0
 `;
 
 const inAmountQuery = `
-SELECT DISTINCT ssw.settlementWindowId, pc.currencyId as currency, spc.netAmount AS inAmount, p.name AS fspId, p.participantId
+SELECT DISTINCT ssw.settlementWindowId, pc.currencyId as currency, stp.amount AS inAmount, p.name AS fspId, p.participantId
  FROM settlement
  INNER JOIN settlementSettlementWindow AS ssw ON ssw.settlementId = settlement.settlementId
  INNER JOIN settlementWindow AS sw ON sw.settlementWindowId = ssw.settlementWindowId
  INNER JOIN settlementTransferParticipant AS stp ON stp.settlementId = settlement.settlementId
         AND stp.settlementWindowId = sw.settlementWindowId
- INNER JOIN settlementParticipantCurrency AS spc ON spc.settlementId = stp.settlementId
-    AND  spc.participantCurrencyId  = stp.participantCurrencyId
- INNER JOIN participantCurrency AS pc ON pc.participantCurrencyId = spc.participantCurrencyId
+ INNER JOIN participantCurrency AS pc ON pc.participantCurrencyId = stp.participantCurrencyId
  INNER JOIN participant AS p ON p.participantId = pc.participantId
  WHERE ssw.settlementWindowId = ?
- AND spc.netAmount < 0
+ AND stp.amount < 0
 `;
 
 const netAmountQuery = `
