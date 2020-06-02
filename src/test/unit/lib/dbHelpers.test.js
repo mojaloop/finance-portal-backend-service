@@ -33,7 +33,7 @@ const transfers = [
 
 describe('db helpers: ', () => {
     it('should return an object with the total per currency', () => {
-        const totalPerCurrency = { EUR: 27, MAD: 323.97 };
+        const totalPerCurrency = { EUR: 27, MAD: 0 };
         expect(sumAllParticipants(transfers)).toEqual(totalPerCurrency);
     });
 
