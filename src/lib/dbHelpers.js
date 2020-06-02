@@ -1,5 +1,5 @@
 // Sum all the amounts for all given currencies into an array of objects.
-const sumAllParticipants = participantAmount => participantAmount.filter( a => !a.fspId.includes('DFSP'))
+const sumAllParticipants = participantAmount => participantAmount.filter(a => !a.fspId.includes('DFSP'))
     .reduce((total, participantAmnt) => {
         const amounts = total;
         if (Object.keys(total).length === 0) {
