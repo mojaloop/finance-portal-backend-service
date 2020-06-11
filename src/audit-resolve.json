@@ -9032,8 +9032,8 @@
     },
     "1500|npm-audit-resolver>audit-resolve-core>yargs-parser": {
       "decision": "ignore",
-      "madeAt": 1591088084576,
-      "expiresAt": 1591692873279
+      "madeAt": 1591873497180,
+      "expiresAt": 1592478292600
     }
   },
   "rules": {},
