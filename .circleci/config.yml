@@ -26,13 +26,12 @@ defaults_Dependencies: &defaults_Dependencies |
 
 defaults_awsCliDependencies: &defaults_awsCliDependencies |
     apk --no-cache add \
-            python \
-            py-pip \
+            python3 \
+            py3-pip \
             groff \
             less \
             mailcap
-    pip install --upgrade awscli==1.14.5 s3cmd==2.0.1 python-magic
-    apk -v --purge del py-pip
+    pip3 install --upgrade awscli==1.14.5 s3cmd==2.0.1 python-magic
 
 defaults_license_scanner: &defaults_license_scanner
   name: Install and set up license-scanner
@@ -120,11 +119,11 @@ jobs:
           command: mkdir -p /tmp/audit/results
       - run:
           name: Check for new npm vulnerabilities
-          command: cd src && npm run audit:check --silent -- --json > /tmp/audit/results/auditResults.json 
+          command: cd src && npm run audit:check --silent -- --json > /tmp/audit/results/auditResults.json
       - store_artifacts:
           path: /tmp/audit/results
           prefix: audit
-          
+
   audit-licenses:
     executor: default-docker
     steps:
@@ -268,7 +267,7 @@ jobs:
             --set finance-portal.backend.image.repository=$DOCKER_ORG/$CIRCLE_PROJECT_REPONAME \
             --set finance-portal.backend.image.tag=$CIRCLE_TAG \
             --set finance-portal.backend.init.image.repository=$DOCKER_ORG/$CIRCLE_PROJECT_REPONAME \
-            --set finance-portal.backend.init.image.tag=$CIRCLE_TAG 
+            --set finance-portal.backend.init.image.tag=$CIRCLE_TAG
 
 ##
 # Workflows
