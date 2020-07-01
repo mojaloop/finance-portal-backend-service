@@ -345,10 +345,7 @@ FROM  (
     INNER JOIN settlementSettlementWindow AS ssw ON ssw.settlementId = settlement.settlementId
     INNER JOIN settlementWindow AS sw ON sw.settlementWindowId = ssw.settlementWindowId
     INNER JOIN settlementWindowStateChange AS swsc ON swsc.settlementWindowStateChangeId = sw.currentStateChangeId
-    INNER JOIN settlementTransferParticipant AS stp ON stp.settlementId = settlement.settlementId
-      AND stp.settlementWindowId = sw.settlementWindowId
-    INNER JOIN settlementParticipantCurrency AS spc ON spc.settlementId = stp.settlementId
-      AND  spc.participantCurrencyId  = stp.participantCurrencyId
+    INNER JOIN settlementParticipantCurrency AS spc ON spc.settlementId = settlement.settlementId
     INNER JOIN settlementParticipantCurrencyStateChange AS spcsc ON spcsc.settlementParticipantCurrencyStateChangeId = spc.currentStateChangeId
     INNER JOIN participantCurrency AS pc ON pc.participantCurrencyId = spc.participantCurrencyId
     INNER JOIN participant AS p ON p.participantId = pc.participantId
@@ -386,34 +383,31 @@ SELECT sw.settlementWindowId, swsc.settlementWindowStateId, 0 AS amount, 'N/A' A
  WHERE sw.settlementWindowId = ?
   AND swClose.settlementWindowStateId = 'CLOSED'
   AND swOpen.settlementWindowStateId = 'OPEN'
-  AND ( NOT EXISTS (select 1 from central_ledger.settlement WHERE settlement.settlementId = ssw.settlementId)
-    OR NOT EXISTS (select 1 from settlementTransferParticipant stp WHERE stp.settlementId = ssw.settlementId))
+  AND NOT EXISTS (select 1 from central_ledger.settlement WHERE settlement.settlementId = ssw.settlementId)
 `;
 
 const outAmountQuery = `
-SELECT DISTINCT ssw.settlementWindowId, pc.currencyId as currency, stp.amount AS outAmount, p.name AS fspId, p.participantId
+SELECT DISTINCT ssw.settlementWindowId, pc.currencyId as currency, spc.netAmount AS outAmount, p.name AS fspId, p.participantId
  FROM settlement
  INNER JOIN settlementSettlementWindow AS ssw ON ssw.settlementId = settlement.settlementId
  INNER JOIN settlementWindow AS sw ON sw.settlementWindowId = ssw.settlementWindowId
- INNER JOIN settlementTransferParticipant AS stp ON stp.settlementId = settlement.settlementId
-        AND stp.settlementWindowId = sw.settlementWindowId
- INNER JOIN participantCurrency AS pc ON pc.participantCurrencyId = stp.participantCurrencyId
+ INNER JOIN settlementParticipantCurrency AS spc ON spc.settlementId = settlement.settlementId
+ INNER JOIN participantCurrency AS pc ON pc.participantCurrencyId = spc.participantCurrencyId
  INNER JOIN participant AS p ON p.participantId = pc.participantId
  WHERE ssw.settlementWindowId = ?
- AND stp.amount > 0
+ AND spc.netAmount > 0
 `;
 
 const inAmountQuery = `
-SELECT DISTINCT ssw.settlementWindowId, pc.currencyId as currency, stp.amount AS inAmount, p.name AS fspId, p.participantId
+SELECT DISTINCT ssw.settlementWindowId, pc.currencyId as currency, spc.netAmount AS inAmount, p.name AS fspId, p.participantId
  FROM settlement
  INNER JOIN settlementSettlementWindow AS ssw ON ssw.settlementId = settlement.settlementId
  INNER JOIN settlementWindow AS sw ON sw.settlementWindowId = ssw.settlementWindowId
- INNER JOIN settlementTransferParticipant AS stp ON stp.settlementId = settlement.settlementId
-        AND stp.settlementWindowId = sw.settlementWindowId
- INNER JOIN participantCurrency AS pc ON pc.participantCurrencyId = stp.participantCurrencyId
+ INNER JOIN settlementParticipantCurrency AS spc ON spc.settlementId = settlement.settlementId
+ INNER JOIN participantCurrency AS pc ON pc.participantCurrencyId = spc.participantCurrencyId
  INNER JOIN participant AS p ON p.participantId = pc.participantId
  WHERE ssw.settlementWindowId = ?
- AND stp.amount < 0
+ AND spc.netAmount < 0
 `;
 
 const netAmountQuery = `
@@ -423,10 +417,7 @@ FROM (
   FROM settlement
     INNER JOIN settlementSettlementWindow AS ssw ON ssw.settlementId = settlement.settlementId
     INNER JOIN settlementWindow AS sw ON sw.settlementWindowId = ssw.settlementWindowId
-    INNER JOIN settlementTransferParticipant AS stp ON stp.settlementId = settlement.settlementId
-      AND stp.settlementWindowId = sw.settlementWindowId
-    INNER JOIN settlementParticipantCurrency AS spc ON spc.settlementId = stp.settlementId
-      AND  spc.participantCurrencyId  = stp.participantCurrencyId
+    INNER JOIN settlementParticipantCurrency AS spc ON spc.settlementId = settlement.settlementId
     INNER JOIN participantCurrency AS pc ON pc.participantCurrencyId = spc.participantCurrencyId
     INNER JOIN participant AS p ON p.participantId = pc.participantId
   WHERE ssw.settlementWindowId = ? ) AS tab
@@ -501,29 +492,13 @@ FROM
   INNER JOIN settlementSettlementWindow AS ssw ON  ssw.settlementId = settlement.settlementId
   INNER JOIN settlementWindow AS sw ON sw.settlementWindowId = ssw.settlementWindowId
   INNER JOIN settlementWindowStateChange AS swsc ON swsc.settlementWindowStateChangeId = sw.currentStateChangeId
-  INNER JOIN settlementTransferParticipant AS stp ON stp.settlementId = settlement.settlementId AND stp.settlementWindowId = sw.settlementWindowId
-  INNER JOIN settlementParticipantCurrency AS spc ON spc.settlementId = stp.settlementId AND spc.participantCurrencyId = stp.participantCurrencyId
+  INNER JOIN settlementParticipantCurrency AS spc ON spc.settlementId = settlement.settlementId -- AND spc.participantCurrencyId = stp.participantCurrencyId
   INNER JOIN settlementParticipantCurrencyStateChange AS spcsc ON spcsc.settlementParticipantCurrencyStateChangeId = spc.currentStateChangeId
   INNER JOIN participantCurrency AS pc ON pc.participantCurrencyId = spc.participantCurrencyId
   INNER JOIN settlementWindowStateChange AS swClose ON swClose.settlementWindowId = sw.settlementWindowId
 
   WHERE spc.netAmount >= 0
   AND swClose.settlementWindowStateId = 'CLOSED'
-
-  UNION ALL
-
-  SELECT DISTINCT sw.settlementWindowId,
-            swsc.settlementWindowStateId, swsc.reason AS settlementWindowReason, sw.createdDate,
-            swClose.createdDate AS 'settlementWindowClose',
-            0 AS accountAmount, NULL AS accountCurrency
-  FROM settlement
-  INNER JOIN settlementSettlementWindow AS ssw ON  ssw.settlementId = settlement.settlementId
-  INNER JOIN settlementWindow AS sw ON sw.settlementWindowId = ssw.settlementWindowId
-  INNER JOIN settlementWindowStateChange AS swsc ON swsc.settlementWindowStateChangeId = sw.currentStateChangeId
-  LEFT JOIN settlementTransferParticipant AS stp ON stp.settlementId = settlement.settlementId AND stp.settlementWindowId = sw.settlementWindowId
-  INNER JOIN settlementWindowStateChange AS swClose ON swClose.settlementWindowId = sw.settlementWindowId
-  WHERE swClose.settlementWindowStateId = 'CLOSED'
-  AND stp.settlementId IS NULL
 
   UNION ALL
 
