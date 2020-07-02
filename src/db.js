@@ -387,27 +387,27 @@ SELECT sw.settlementWindowId, swsc.settlementWindowStateId, 0 AS amount, 'N/A' A
 `;
 
 const outAmountQuery = `
-SELECT DISTINCT ssw.settlementWindowId, pc.currencyId as currency, spc.netAmount AS outAmount, p.name AS fspId, p.participantId
+SELECT DISTINCT ssw.settlementWindowId, pc.currencyId as currency, sca.amount AS outAmount, p.name AS fspId, p.participantId
  FROM settlement
  INNER JOIN settlementSettlementWindow AS ssw ON ssw.settlementId = settlement.settlementId
  INNER JOIN settlementWindow AS sw ON sw.settlementWindowId = ssw.settlementWindowId
- INNER JOIN settlementParticipantCurrency AS spc ON spc.settlementId = settlement.settlementId
- INNER JOIN participantCurrency AS pc ON pc.participantCurrencyId = spc.participantCurrencyId
+ INNER JOIN settlementContentAggregation AS sca ON sca.settlementId = settlement.settlementId
+ INNER JOIN participantCurrency AS pc ON pc.participantCurrencyId = sca.participantCurrencyId
  INNER JOIN participant AS p ON p.participantId = pc.participantId
  WHERE ssw.settlementWindowId = ?
- AND spc.netAmount > 0
+ AND sca.amount > 0
 `;
 
 const inAmountQuery = `
-SELECT DISTINCT ssw.settlementWindowId, pc.currencyId as currency, spc.netAmount AS inAmount, p.name AS fspId, p.participantId
+SELECT DISTINCT ssw.settlementWindowId, pc.currencyId as currency, sca.amount AS inAmount, p.name AS fspId, p.participantId
  FROM settlement
  INNER JOIN settlementSettlementWindow AS ssw ON ssw.settlementId = settlement.settlementId
  INNER JOIN settlementWindow AS sw ON sw.settlementWindowId = ssw.settlementWindowId
- INNER JOIN settlementParticipantCurrency AS spc ON spc.settlementId = settlement.settlementId
- INNER JOIN participantCurrency AS pc ON pc.participantCurrencyId = spc.participantCurrencyId
+ INNER JOIN settlementContentAggregation AS sca ON sca.settlementId = settlement.settlementId
+ INNER JOIN participantCurrency AS pc ON pc.participantCurrencyId = sca.participantCurrencyId
  INNER JOIN participant AS p ON p.participantId = pc.participantId
  WHERE ssw.settlementWindowId = ?
- AND spc.netAmount < 0
+ AND sca.amount < 0
 `;
 
 const netAmountQuery = `
