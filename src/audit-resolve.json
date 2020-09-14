@@ -43184,6 +43184,11 @@
       "decision": "ignore",
       "madeAt": 1593643252462,
       "expiresAt": 1596235239443
+    },
+    "1556|@mojaloop/finance-portal-lib>node-fetch": {
+      "decision": "ignore",
+      "madeAt": 1600113445317,
+      "expiresAt": 1600718234863
     }
   },
   "rules": {},
