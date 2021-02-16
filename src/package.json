@@ -19,7 +19,7 @@
   "homepage": "https://github.com/mojaloop/finance-portal-backend-service#readme",
   "dependencies": {
     "@mojaloop/finance-portal-lib": "0.1.0",
-    "axios": "0.18.1",
+    "axios": "0.21.1",
     "base64url": "3.0.1",
     "big.js": "5.2.2",
     "dotenv": "6.2.0",
