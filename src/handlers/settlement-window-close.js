@@ -8,8 +8,14 @@ const handler = (router, routesContext) => {
         const { startDate: fromDateTime, endDate: toDateTime } = ctx.request.body;
 
         try {
-            const resp = await axios.post(`${routesContext.config.externalSettlementsEndpoint}/settlement-windows/current/close`, {});
-            if (resp.status === 202) {
+            const resp = await axios.post(
+                `${routesContext.config.centralSettlementsEndpoint}/settlementWindows/${ctx.params.settlementWindowId}`,
+                {
+                    state: 'CLOSED',
+                    reason: 'Finance portal user request',
+                },
+            );
+            if (resp.status === 200) {
                 ctx.response.status = 200;
             } else {
                 ctx.response.status = 502;
