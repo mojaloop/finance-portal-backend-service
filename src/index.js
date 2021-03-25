@@ -29,5 +29,14 @@ if (config.auth.bypass) {
 
 log('Config:', config);
 const server = createServer(config, db, log, Database);
-server.listen(config.server.listenPort);
+const listener = server.listen(config.server.listenPort);
+
+const handle = async (signal) => {
+    log(`Received signal ${signal}. Shutting down..`);
+    listener.close();
+    process.exit();
+};
+process.on('SIGINT', handle);
+process.on('SIGTERM', handle);
+
 log(`Listening on port ${config.server.listenPort}`);
