@@ -124,7 +124,7 @@ const createServer = (config, db, log, Database) => {
         //   mojaloop-portal-token=abcde
         // But when doing local development, the cookie may look like:
         //   some-rubbish=whatever; mojaloop-portal-token=abcde; other-rubbish=defgh
-        // because of other cookies set on localhost. So we take some more care extracting it here.
+        // because of other cookies set on the host. So we take some more care extracting it here.
         const token = ctx.request
             // get the cookie header string, it'll look like
             // some-rubbish=whatever; token=abcde; other-crap=defgh
