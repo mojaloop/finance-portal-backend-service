@@ -179,13 +179,13 @@ const createServer = (config, db, log, Database) => {
         );
         // user role/permissions
         if (!isPermitted) {
+            log('request forbidden according to application permissions');
             ctx.response.body = { message: 'Forbidden' };
             ctx.response.status = 401;
             return;
         }
+        log('request permitted according to application permissions');
 
-        ctx.response.body = { isValid };
-        ctx.response.status = isValid ? 200 : 404;
         await next();
     });
 
