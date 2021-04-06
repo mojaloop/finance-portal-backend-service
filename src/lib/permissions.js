@@ -16,7 +16,9 @@ const permit = async (userInfoURL, token, requestMethod, requestPath, log) => {
         agent: selfSignedAgent,
     };
     const userinfo = await fetch(userInfoURL, opts).then(res => res.json());
-    const usergroups = userinfo.groups.split(',');
+    log('Got userinfo:', userinfo);
+
+    const usergroups = userinfo.groups ? userinfo.groups.split(',') : [];
     if (requestPath.includes('netdebitcap') && requestMethod === 'POST') {
         // the roles in WSO2 IS some times appear all UPPERCASE and sometimes just Capitalized
         // so we better perform a case insensitive comparison since this is what WSO2 IS also does

@@ -14,6 +14,10 @@ const { permit } = require('./lib/permissions');
 // TODO: do we need this? It's used when contacting wso2. Does wso2 have a self-signed cert?
 const selfSignedAgent = new https.Agent({ rejectUnauthorized: false });
 
+const constants = {
+    TOKEN_COOKIE_NAME: 'mojaloop-portal-token',
+};
+
 //
 // Server
 //
@@ -116,7 +120,28 @@ const createServer = (config, db, log, Database) => {
             return;
         }
 
-        const token = ctx.request.get('Cookie').split('=').splice(1).join('');
+        // The cookie _should_ look like:
+        //   mojaloop-portal-token=abcde
+        // But when doing local development, the cookie may look like:
+        //   some-rubbish=whatever; mojaloop-portal-token=abcde; other-rubbish=defgh
+        // because of other cookies set on the host. So we take some more care extracting it here.
+        const token = ctx.request
+            // get the cookie header string, it'll look like
+            // some-rubbish=whatever; token=abcde; other-crap=defgh
+            .get('Cookie')
+            // Split it so we have some key-value pairs that look like
+            // [['some-rubbish', 'whatever'], ['token', 'abcde'], ['other-rubbish', 'defgh']]
+            .split(';')
+            .map(cookie => cookie.trim().split('='))
+            // Find the token cookie and get its value
+            // We assume there's only one instance of our cookie
+            .find(([name]) => name === constants.TOKEN_COOKIE_NAME)[1];
+
+        if (!token) {
+            ctx.response.status = 401;
+            ctx.response.body = { message: 'Authorization token cookie not present' };
+            return;
+        }
 
         log('validating request token:', token);
         const opts = {
@@ -128,7 +153,18 @@ const createServer = (config, db, log, Database) => {
             agent: selfSignedAgent,
         };
 
-        const validToken = await fetch(config.auth.validateEndpoint, opts).then(res => res.json());
+        const authResponse = await fetch(config.auth.validateEndpoint, opts);
+        if (authResponse.status !== 200) {
+            const message = await authResponse.text();
+            log(`authorization server returned [${authResponse.status}]: ${message}`);
+            ctx.response.status = 401;
+            ctx.response.body = { message: message || 'Unauthorized' };
+            return;
+        }
+        log(`authorization server returned [${authResponse.status}] response`);
+        log('token validated by authorization server');
+
+        const validToken = await authResponse.json();
         const isValid = validToken.active === true;
 
         if (!isValid) {
@@ -172,6 +208,7 @@ const createServer = (config, db, log, Database) => {
                 db,
                 log,
                 Database,
+                constants,
             }]);
         });
 

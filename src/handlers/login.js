@@ -6,12 +6,14 @@ const qs = require('querystring');
 // TODO: do we need this? It's used when contacting wso2. Does wso2 have a self-signed cert?
 const selfSignedAgent = new https.Agent({ rejectUnauthorized: false });
 
-// TODO: set the Max-Age directive corresponding to the token expiry time.
-const cookieDirectives = (token, insecure) => (
-    insecure ? `token=${token};` : `token=${token}; HttpOnly; SameSite=strict; Secure`
-);
-
 const handler = (router, routesContext) => {
+    // TODO: set the Max-Age directive corresponding to the token expiry time.
+    const cookieDirectives = (token, insecure) => (
+        insecure
+            ? `${routesContext.constants.TOKEN_COOKIE_NAME}=${token};`
+            : `token=${token}; HttpOnly; SameSite=strict; Secure`
+    );
+
     router.post('/login', async (ctx, next) => {
         if (routesContext.config.auth.bypass) {
             routesContext.log('authentication bypassed');
