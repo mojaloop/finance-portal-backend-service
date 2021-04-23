@@ -29,7 +29,7 @@ describe('POST /login', () => {
         const response = await request(server).post('/login');
         expect(response.status).toEqual(200);
         expect(response.headers['set-cookie']).toEqual([
-            `token=${access_token}; HttpOnly; SameSite=strict; Secure`,
+            `mojaloop-portal-token=${access_token}; HttpOnly; SameSite=strict; Secure`,
         ]);
     });
 });
