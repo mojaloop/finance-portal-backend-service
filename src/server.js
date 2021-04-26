@@ -165,7 +165,6 @@ const createServer = (config, db, log, Database) => {
         log('token validated by authorization server');
 
         const authResponseToken = await authResponse.json();
-        log('auth response token', authResponseToken);
         const isValid = authResponseToken.active === true;
 
         if (!isValid) {
