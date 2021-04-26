@@ -164,8 +164,8 @@ const createServer = (config, db, log, Database) => {
         log(`authorization server returned [${authResponse.status}] response`);
         log('token validated by authorization server');
 
-        const validToken = await authResponse.json();
-        const isValid = validToken.active === true;
+        const authResponseToken = await authResponse.json();
+        const isValid = authResponseToken.active === true;
 
         if (!isValid) {
             log('session expired');
