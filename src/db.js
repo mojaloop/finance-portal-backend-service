@@ -806,8 +806,20 @@ module.exports = class Database {
     async putSettlementAccountBalance(participantId, balance) {
       const [fullResult] = await this.connection.query(`
           UPDATE
-          `,
-        [participantId],
+            participantPosition pp
+          INNER JOIN
+            participantCurrency pc ON pc.participantCurrencyId = pp.participantCurrencyId
+          INNER JOIN
+            ledgerAccountType lat ON lat.ledgerAccountTypeId = pc.ledgerAccountTypeId
+          SET
+            pp.value = ?
+          WHERE
+            lat.name = 'SETTLEMENT'
+          AND
+            pc.participantId = ?
+          AND 
+            pc.isActive = 1`,
+        [balance, participantId],
       );
       return fullResult;
     }

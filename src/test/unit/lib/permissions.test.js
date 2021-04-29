@@ -86,10 +86,10 @@ describe('permissions:', () => {
                         });
 
                         it('returns `true` if at least one of the allowed roles is included in the '
-                            + '`usergroups` object of the response (`APPLICATION/mfp-ndc-rw`).', async () => {
+                            + '`usergroups` object of the response (`NDC_UPDATE`).', async () => {
                             fetch.mockReturnValue(Promise.resolve(new Response(
                                 JSON.stringify({
-                                    groups: 'foo,bar,baz,APPLICATION/mfp-ndc-rw',
+                                    groups: 'foo,bar,baz,NDC_UPDATE',
                                 }),
                             )));
 
@@ -100,10 +100,10 @@ describe('permissions:', () => {
                         });
 
                         it('returns `true` if at least one of the allowed roles is included in the '
-                            + '`usergroups` object of the response (`Application/mfp-ndc-rw`).', async () => {
+                            + '`usergroups` object of the response (`Ndc_update`).', async () => {
                             fetch.mockReturnValue(Promise.resolve(new Response(
                                 JSON.stringify({
-                                    groups: 'foo,bar,baz,Application/mfp-ndc-rw',
+                                    groups: 'foo,bar,baz,Ndc_update',
                                 }),
                             )));
 
@@ -114,10 +114,10 @@ describe('permissions:', () => {
                         });
 
                         it('returns `true` if at least one of the allowed roles is included in the '
-                            + '`usergroups` object of the response (`AppLICATION/mfp-ndc-rw`).', async () => {
+                            + '`usergroups` object of the response (`NdC_Update`).', async () => {
                             fetch.mockReturnValue(Promise.resolve(new Response(
                                 JSON.stringify({
-                                    groups: 'foo,bar,baz,AppLICATION/mfp-ndc-rw',
+                                    groups: 'foo,bar,baz,NdC_Update',
                                 }),
                             )));
 
@@ -128,10 +128,10 @@ describe('permissions:', () => {
                         });
 
                         it('returns `true` if at least one of the allowed roles is included in the '
-                            + '`usergroups` object of the response (`application/MFP-NDC-RW`).', async () => {
+                            + '`usergroups` object of the response (`ndc_UPDATE`).', async () => {
                             fetch.mockReturnValue(Promise.resolve(new Response(
                                 JSON.stringify({
-                                    groups: 'foo,bar,baz,application/MFP-NDC-RW',
+                                    groups: 'foo,bar,baz,ndc_UPDATE',
                                 }),
                             )));
 

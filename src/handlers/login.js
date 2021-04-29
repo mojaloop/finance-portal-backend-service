@@ -11,7 +11,7 @@ const handler = (router, routesContext) => {
     const cookieDirectives = (token, insecure) => (
         insecure
             ? `${routesContext.constants.TOKEN_COOKIE_NAME}=${token};`
-            : `token=${token}; HttpOnly; SameSite=strict; Secure`
+            : `${routesContext.constants.TOKEN_COOKIE_NAME}=${token}; HttpOnly; SameSite=strict; Secure`
     );
 
     router.post('/login', async (ctx, next) => {
