@@ -803,6 +803,15 @@ module.exports = class Database {
         return fullResult;
     }
 
+    async putSettlementAccountBalance(participantId, balance) {
+      const [fullResult] = await this.connection.query(`
+          UPDATE
+          `,
+        [participantId],
+      );
+      return fullResult;
+    }
+
     async getTransferState(transferId) {
         const [transferState] = await this.connection.query(`
             SELECT * FROM transferStateChange tsc
