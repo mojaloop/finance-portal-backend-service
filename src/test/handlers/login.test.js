@@ -18,7 +18,7 @@ describe('POST /login', () => {
         fetch.mockReturnValue(Promise.resolve(new Response(JSON.stringify({ access_token }))));
         const response = await request(server).post('/login');
         expect(response.status).toEqual(200);
-        expect(response.headers['set-cookie']).toEqual([`mojaloop-portal-token=${access_token};`]);
+        expect(response.headers['set-cookie']).toEqual([`mojaloop-portal-token=${access_token}; Path=/`]);
     });
 
     test('should respond with secure directives when cookie is not set to insecure', async () => {
@@ -29,7 +29,7 @@ describe('POST /login', () => {
         const response = await request(server).post('/login');
         expect(response.status).toEqual(200);
         expect(response.headers['set-cookie']).toEqual([
-            `mojaloop-portal-token=${access_token}; HttpOnly; SameSite=strict; Secure`,
+            `mojaloop-portal-token=${access_token}; HttpOnly; SameSite=strict; Secure; Path=/`,
         ]);
     });
 });
