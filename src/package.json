@@ -25,7 +25,7 @@
     "big.js": "5.2.2",
     "dotenv": "6.2.0",
     "glob": "7.1.4",
-    "json-2-csv": "3.5.3",
+    "json-2-csv": "^3.11.1",
     "jsonwebtoken": "8.5.1",
     "koa": "2.7.0",
     "koa-body": "4.1.0",
