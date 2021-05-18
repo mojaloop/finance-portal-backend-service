@@ -10,8 +10,8 @@ const handler = (router, routesContext) => {
     // TODO: set the Max-Age directive corresponding to the token expiry time.
     const cookieDirectives = (token, insecure) => (
         insecure
-            ? `${routesContext.constants.TOKEN_COOKIE_NAME}=${token};`
-            : `${routesContext.constants.TOKEN_COOKIE_NAME}=${token}; HttpOnly; SameSite=strict; Secure`
+            ? `${routesContext.constants.TOKEN_COOKIE_NAME}=${token}; Path=/`
+            : `${routesContext.constants.TOKEN_COOKIE_NAME}=${token}; HttpOnly; SameSite=strict; Secure; Path=/`
     );
 
     router.post('/login', async (ctx, next) => {

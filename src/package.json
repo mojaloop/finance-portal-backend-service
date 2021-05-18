@@ -1,12 +1,13 @@
 {
   "name": "@mojaloop/finance-portal-backend-service",
-  "version": "15.0.0",
+  "version": "15.0.1",
   "description": "The backend service to support the finance portal web ui. Essentially a thin wrapper around SQL queries.",
   "license": "Apache-2.0",
   "contributors": [
     "Matt Kingston <matt.kingston@modusbox.com>",
     "Shashikant Hirugade <shashikant.hirugade@modusbox.com>",
-    "Vassilis Barzokas <vassilis.barzokas@modusbox.com>"
+    "Vassilis Barzokas <vassilis.barzokas@modusbox.com>",
+    "James Bush <james.bush@modusbox.com>"
   ],
   "main": "index.js",
   "repository": {
