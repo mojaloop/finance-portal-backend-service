@@ -131,11 +131,11 @@ const createServer = (config, db, log, Database) => {
             .get('Cookie')
             // Split it so we have some key-value pairs that look like
             // [['some-rubbish', 'whatever'], ['token', 'abcde'], ['other-rubbish', 'defgh']]
-            .split(';')
-            .map(cookie => cookie.trim().split('='))
+            ?.split(';')
+            ?.map(cookie => cookie.trim().split('='))
             // Find the token cookie and get its value
             // We assume there's only one instance of our cookie
-            .find(([name]) => name === constants.TOKEN_COOKIE_NAME)[1];
+            ?.find(([name]) => name === constants.TOKEN_COOKIE_NAME)?.[1];
 
         if (!token) {
             ctx.response.status = 401;
