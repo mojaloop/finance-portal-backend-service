@@ -7,7 +7,7 @@ const handler = (router, routesContext) => {
         const accounts = await getParticipantAccounts(
             routesContext.config.centralLedgerEndpoint, ctx.params.participantName,
         );
-        const positionAccounts = accounts.filter(a => a.ledgerAccountType === 'POSITION'
+        const positionAccounts = accounts.filter((a) => a.ledgerAccountType === 'POSITION'
             && a.isActive === 1);
         const ndc = await Promise.all(positionAccounts.map(async (acc) => {
             const limit = await getNDC(
@@ -36,7 +36,7 @@ const handler = (router, routesContext) => {
             routesContext.config.centralLedgerEndpoint, ctx.params.participantName,
         );
         const positionAccounts = accounts
-            .filter(a => a.ledgerAccountType === 'POSITION' && a.id === ctx.request.body.accountId);
+            .filter((a) => a.ledgerAccountType === 'POSITION' && a.id === ctx.request.body.accountId);
         const ndc = await Promise.all(positionAccounts.map(async (acc) => {
             const limit = await getNDC(
                 routesContext.config.centralLedgerEndpoint,

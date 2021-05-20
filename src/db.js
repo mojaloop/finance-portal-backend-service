@@ -78,7 +78,6 @@ const previousSettlementWindowDataQuery = `
   ORDER BY close DESC
 `;
 
-
 // TODO: change the line 'AND sw.createdDate < (...)' to 'AND sw.createdDate = (...)'
 // TODO: evaluate what information in this query is not necessary for the UI
 // TODO: remove the LIMIT 1 clause at the end of this query
@@ -659,8 +658,8 @@ module.exports = class Database {
     async getHistoricalSettlementWindowData({ participantName, fromDateTime, toDateTime }) {
         const windows = await this.connection.query(historicalSettlementWindowDataQuery,
             [participantName, participantName, fromDateTime, toDateTime])
-            .then(d => d[0])
-            .then(ws => ws.map(w => (
+            .then((d) => d[0])
+            .then((ws) => ws.map((w) => (
                 { ...w, payments: Number(w.payments), receipts: Number(w.receipts) })));
 
         // Now we need to get the ndc and limit history for each currency present
@@ -679,7 +678,7 @@ module.exports = class Database {
     async getLimitAndPositionHistory({
         currencies, participantName, fromDateTime, toDateTime,
     }) {
-        return Promise.all(currencies.map(curr => Promise.all([
+        return Promise.all(currencies.map((curr) => Promise.all([
             curr,
             this.connection.query(
                 historicalParticipantLimitQuery,
@@ -695,7 +694,7 @@ module.exports = class Database {
                     participantName,
                     curr,
                 ],
-            ).then(l => l[0]),
+            ).then((l) => l[0]),
             this.connection.query(
                 historicalParticipantPositionQuery,
                 [
@@ -710,20 +709,20 @@ module.exports = class Database {
                     participantName,
                     toDateTime,
                 ],
-            ).then(p => p[0]),
+            ).then((p) => p[0]),
         ]).then(([curr, limits, positions]) => [ // eslint-disable-line no-shadow
             // parse numeric values
             curr,
-            limits.map(l => ({ ...l, lim: Number(l.lim) })),
-            positions.map(p => ({ ...p, value: Number(p.value) })),
+            limits.map((l) => ({ ...l, lim: Number(l.lim) })),
+            positions.map((p) => ({ ...p, value: Number(p.value) })),
         ])));
     }
 
     async getPreviousSettlementWindowData({ participantName }) {
         const windows = await this
             .connection.query(previousSettlementWindowDataQuery, [participantName, participantName])
-            .then(d => d[0])
-            .then(ws => ws.map(w => ({
+            .then((d) => d[0])
+            .then((ws) => ws.map((w) => ({
                 ...w,
                 payments: Number(w.payments),
                 receipts: Number(w.receipts),
@@ -764,8 +763,8 @@ module.exports = class Database {
 
         // TODO: use const participantAmount = netAmount.map(...) here?
         netAmount.forEach((element) => {
-            const inRecord = inAmount.find(n => n.fspId === element.fspId);
-            const outRecord = outAmount.find(n => n.fspId === element.fspId);
+            const inRecord = inAmount.find((n) => n.fspId === element.fspId);
+            const outRecord = outAmount.find((n) => n.fspId === element.fspId);
             const inValue = inRecord ? inRecord.inAmount : 0;
             const outValue = outRecord ? outRecord.outAmount : 0;
             const obj = {
@@ -779,7 +778,7 @@ module.exports = class Database {
         });
         const totalAmounts = sumAllParticipants(participantAmount);
         const sumTotalAmount = convertParticipantsAmountsToStrings(totalAmounts);
-        const result = settlementWindow.filter(n => n.settlementWindowId !== null);
+        const result = settlementWindow.filter((n) => n.settlementWindowId !== null);
         return {
             settlementWindow: (result.length === 1 ? result[0] : {}),
             participantAmount,

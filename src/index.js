@@ -2,16 +2,18 @@ const createServer = require('./server');
 const Database = require('./db');
 const config = require('./config/config');
 const log = require('./lib/log');
+const { version } = require('./package.json');
 
 // /////////////////////////////////////////////////////////////////////////////
 // Config
 // /////////////////////////////////////////////////////////////////////////////
 
+// Log development/production status
+log('Running portal version ', version);
+log('Running in ', process.env.NODE_ENV);
+
 // Set up the db
 const db = new Database(config.db);
-
-// Log development/production status
-log('Running in ', process.env.NODE_ENV);
 
 // Warnings for certain environment var settings
 if (config.cors.reflectOrigin && process.env.NODE_ENV !== 'development') {
@@ -21,7 +23,6 @@ if (config.cors.reflectOrigin && process.env.NODE_ENV !== 'development') {
 if (config.auth.bypass) {
     log('WARNING: auth bypass enabled- all login requests will be approved');
 }
-
 
 // /////////////////////////////////////////////////////////////////////////////
 // Start app

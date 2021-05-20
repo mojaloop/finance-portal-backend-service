@@ -21,7 +21,7 @@ defaults_Dependencies: &defaults_Dependencies |
     apk --no-cache add ca-certificates
     apk --no-cache add curl
     apk --no-cache add openssh-client
-    apk add --no-cache -t build-dependencies make gcc g++ python libtool autoconf automake
+    apk add --no-cache -t build-dependencies make gcc g++ python3 libtool autoconf automake
     npm config set unsafe-perm true
     npm install -g node-gyp
 
@@ -49,7 +49,7 @@ executors:
   default-docker:
     working_directory: /home/circleci/project
     docker:
-      - image: node:12.16.1-alpine
+      - image: node:15-alpine3.13
 
   default-machine:
     machine:
@@ -120,7 +120,7 @@ jobs:
           command: mkdir -p /tmp/audit/results
       - run:
           name: Check for new npm vulnerabilities
-          command: cd src && npm run audit:check --silent -- --json > /tmp/audit/results/auditResults.json
+          command: cd src && npm audit --production --json > /tmp/audit/results/auditResults.json
       - store_artifacts:
           path: /tmp/audit/results
           prefix: audit

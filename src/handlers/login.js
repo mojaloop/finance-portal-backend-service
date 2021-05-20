@@ -46,7 +46,7 @@ const handler = (router, routesContext) => {
         };
 
         const oauth2Token = await fetch(routesContext.config.auth.loginEndpoint, opts)
-            .then(res => res.json());
+            .then((res) => res.json());
         if (oauth2Token.access_token === undefined) {
             ctx.response.status = 401; // TODO: Or 403?
             return;

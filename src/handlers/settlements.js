@@ -21,18 +21,18 @@ const handler = (router, routesContext) => {
         const api = new Model({ endpoint: routesContext.config.centralSettlementsEndpoint });
 
         const filterParticipants = (ps, f) => ps
-            .filter(p => p.accounts.findIndex(a => f(a.netSettlementAmount.amount)) !== -1)
-            .map(p => (
-                { ...p, accounts: p.accounts.filter(a => f(a.netSettlementAmount.amount)) }));
+            .filter((p) => p.accounts.findIndex((a) => f(a.netSettlementAmount.amount)) !== -1)
+            .map((p) => (
+                { ...p, accounts: p.accounts.filter((a) => f(a.netSettlementAmount.amount)) }));
 
         // payers settlement amount will be positive and payees will be negative
-        const getPayers = ps => filterParticipants(ps, x => x > 0);
-        const getPayees = ps => filterParticipants(ps, x => x < 0);
+        const getPayers = (ps) => filterParticipants(ps, (x) => x > 0);
+        const getPayees = (ps) => filterParticipants(ps, (x) => x < 0);
         const payers = getPayers(ctx.request.body.participants);
         const payees = getPayees(ctx.request.body.participants);
-        const newParticipantsAccountState = (ps, reason, state) => ps.map(p => ({
+        const newParticipantsAccountState = (ps, reason, state) => ps.map((p) => ({
             ...p,
-            accounts: p.accounts.map(a => ({ id: a.id, reason, state })),
+            accounts: p.accounts.map((a) => ({ id: a.id, reason, state })),
         }));
 
         const payerParticipants = newParticipantsAccountState(payers, 'Payee: SETTLED, settlement: SETTLED', 'SETTLED');
@@ -49,7 +49,7 @@ const handler = (router, routesContext) => {
         } finally {
             const settlements = await api.getSettlements({ fromDateTime, toDateTime });
             const updatedSettlement = settlements
-                .filter(a => a.id.toString() === ctx.params.settlementId);
+                .filter((a) => a.id.toString() === ctx.params.settlementId);
             ctx.response.body = updatedSettlement[0] || {};
         }
         await next();
@@ -65,8 +65,9 @@ const handler = (router, routesContext) => {
         } = qs.parse(ctx.request.querystring);
         const api = new Model({ endpoint: routesContext.config.centralSettlementsEndpoint });
         const settlements = await api.getSettlements({ fromDateTime, toDateTime });
-        ctx.response.body = settlements
-            .filter(s => s.participants.some(p => p.id === parseInt(ctx.params.participantId, 10)));
+        ctx.response.body = settlements.filter(
+            (s) => s.participants.some((p) => p.id === parseInt(ctx.params.participantId, 10)),
+        );
         ctx.response.status = 200;
         await next();
     });
