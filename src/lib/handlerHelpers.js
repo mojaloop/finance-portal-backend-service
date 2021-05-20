@@ -11,20 +11,20 @@ const getSettlementWindows = async (routesContext, fromDateTime, toDateTime,
 
     if (settlementWindowId != null) {
         filteredResult = result
-            .filter(s => s.settlementWindowId.toString() === settlementWindowId);
+            .filter((s) => s.settlementWindowId.toString() === settlementWindowId);
     }
 
     const multipleRows = filteredResult
-        .map(e => e.settlementWindowId).map((e, i, self) => {
+        .map((e) => e.settlementWindowId).map((e, i, self) => {
             if (self.indexOf(e) !== self.lastIndexOf(e)) {
                 return filteredResult[i];
             }
             return null;
-        }).filter(e => e);
+        }).filter((e) => e);
 
     const difference = filteredResult
-        .filter(n => !multipleRows
-            .some(n2 => n.settlementWindowId === n2.settlementWindowId));
+        .filter((n) => !multipleRows
+            .some((n2) => n.settlementWindowId === n2.settlementWindowId));
 
     const combined = {};
 
@@ -58,31 +58,31 @@ const getSettlementWindows = async (routesContext, fromDateTime, toDateTime,
 };
 
 const filterParticipants = (participants, filter) => participants
-    .filter(participant => participant.accounts
-        .findIndex(account => filter(account.netSettlementAmount.amount)) !== -1)
-    .map(participant => ({
+    .filter((participant) => participant.accounts
+        .findIndex((account) => filter(account.netSettlementAmount.amount)) !== -1)
+    .map((participant) => ({
         ...participant,
         accounts: participant.accounts
-            .filter(account => filter(account.netSettlementAmount.amount)),
+            .filter((account) => filter(account.netSettlementAmount.amount)),
     }));
 
 // Payers' settlement amounts will be positive while payees' will be negative
-const getPayers = participants => filterParticipants(participants, x => x > 0);
-const getPayees = participants => filterParticipants(participants, x => x < 0);
+const getPayers = (participants) => filterParticipants(participants, (x) => x > 0);
+const getPayees = (participants) => filterParticipants(participants, (x) => x < 0);
 
 const newParticipantsAccountStateAndReason = (participants, reason, state) => participants
-    .map(participant => ({
+    .map((participant) => ({
         ...participant,
-        accounts: participant.accounts.map(account => ({ id: account.id, reason, state })),
+        accounts: participant.accounts.map((account) => ({ id: account.id, reason, state })),
     }));
 
 const getParticipantName = (dfsps, participants, participantId) => {
-    const accountIds = participants.find(participant => String(participant.id) === participantId)
-        .accounts.map(account => String(account.id));
+    const accountIds = participants.find((participant) => String(participant.id) === participantId)
+        .accounts.map((account) => String(account.id));
     const participant = dfsps.find((dfsp) => {
-        const dfspAccountIds = dfsp.accounts.map(account => String(account.id));
+        const dfspAccountIds = dfsp.accounts.map((account) => String(account.id));
         const accountPresent = dfspAccountIds
-            .some(accountId => accountIds.includes(accountId));
+            .some((accountId) => accountIds.includes(accountId));
         return accountPresent;
     });
     try {
@@ -101,7 +101,7 @@ const getAllParticipantNames = (dfsps, participants, paymentMatrix) => paymentMa
     });
 
 const getSettlementAccountId = (accounts, currency) => accounts
-    .find(account => account.isActive === 1
+    .find((account) => account.isActive === 1
         && account.ledgerAccountType === 'SETTLEMENT'
         && account.currency === currency)
     .id;
@@ -158,11 +158,11 @@ const processPaymentAndReturnFailedPayment = async (payment, dfsps, participants
 const processPaymentsMatrixAndGetFailedPayments = async (paymentMatrix, dfsps, participants,
     centralLedgerEndpoint, log) => {
     const paymentProcessingResults = await Promise.all(paymentMatrix.map(
-        async unprocessedPayment => processPaymentAndReturnFailedPayment(
+        async (unprocessedPayment) => processPaymentAndReturnFailedPayment(
             unprocessedPayment, dfsps, participants, centralLedgerEndpoint, log,
         ),
     ));
-    const failedPayments = paymentProcessingResults.filter(result => result !== null);
+    const failedPayments = paymentProcessingResults.filter((result) => result !== null);
     return failedPayments;
 };
 

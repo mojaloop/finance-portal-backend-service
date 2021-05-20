@@ -74,19 +74,19 @@ const handler = (router, routesContext) => {
                 ...acc.limits,
                 [w.curr]: {
                     value: (history[w.curr].limits
-                        .find(l => l.createdDate < w.close) || { lim: 0 }).lim,
+                        .find((l) => l.createdDate < w.close) || { lim: 0 }).lim,
                 },
             },
             positions: {
                 ...acc.positions,
                 [w.curr]: {
                     value: (history[w.curr].positions
-                        .find(p => p.createdDate < w.close) || { value: 0 }).value,
+                        .find((p) => p.createdDate < w.close) || { value: 0 }).value,
                 },
             },
         }), {});
 
-        const netPositions = Object.keys(result.payments).map(curr => ({
+        const netPositions = Object.keys(result.payments).map((curr) => ({
             [curr]: result.payments[curr].value - result.receipts[curr].value,
         }));
 

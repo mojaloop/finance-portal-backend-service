@@ -26,7 +26,7 @@ const handler = (router, routesContext) => {
         const emailAddresses = await getParticipantEmailAddresses(
             routesContext.config.centralLedgerEndpoint, participantName, routesContext.log,
         );
-        const emailAddress = emailAddresses.filter(a => a.type === emailType);
+        const emailAddress = emailAddresses.filter((a) => a.type === emailType);
         [ctx.response.body] = emailAddress;
         ctx.response.status = 200;
         await next();

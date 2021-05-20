@@ -69,9 +69,9 @@ const handler = (router, routesContext) => {
                     // Defaults (RHS of ||) here because it's possible a limit or position did not
                     // exist before this window
                     limit: (history[w.curr].limits
-                        .find(l => l.createdDate < w.close) || { lim: 0 }).lim,
+                        .find((l) => l.createdDate < w.close) || { lim: 0 }).lim,
                     position: (history[w.curr].positions
-                        .find(p => p.createdDate < w.close) || { value: 0 }).value,
+                        .find((p) => p.createdDate < w.close) || { value: 0 }).value,
                 },
             },
         }), {});
@@ -79,7 +79,7 @@ const handler = (router, routesContext) => {
         // Note that windowCount should never be zero when currencies is a non-empty array;
         // therefore the following code should never cause a divide by zero
         const windowCount = Object.keys(windows).length;
-        const average = Object.assign(...currencies.map(curr => ({
+        const average = Object.assign(...currencies.map((curr) => ({
             [curr]: {
                 payments: {
                     num: windowArr.reduce((pv, w) => pv + w.numPayments, 0) / windowCount,

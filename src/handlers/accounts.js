@@ -15,7 +15,7 @@ const handler = (router, routesContext) => {
         const accounts = await getParticipantAccounts(
             routesContext.config.centralLedgerEndpoint, ctx.params.participantName,
         );
-        ctx.response.body = accounts.filter(a => a.isActive === 1);
+        ctx.response.body = accounts.filter((a) => a.isActive === 1);
         ctx.response.status = 200;
         await next();
     });
