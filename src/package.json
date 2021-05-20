@@ -44,7 +44,6 @@
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.23.2",
     "jest": "25.1.0",
-    "npm-audit-resolver": "2.2.0",
     "rewire": "5.0.0",
     "supertest": "4.0.2"
   },
@@ -52,8 +51,6 @@
     "start": "node index.js",
     "test": "jest --ci --testMatch '**/test/**/*.test.js' --coverage",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "audit:resolve": "SHELL=sh resolve-audit && sed -i 's/: \"^/: \"/' package.json",
-    "audit:check": "SHELL=sh check-audit"
+    "lint:fix": "eslint . --fix"
   }
 }
