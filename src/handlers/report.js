@@ -1,7 +1,7 @@
 const fetch = require("node-fetch");
 const qs = require("querystring");
 const sendFile = require("koa-send");
-const { URL } = require("url");
+const { URL, URLSearchParams } = require("url");
 const {
   deleteSavedReportFile,
   generateReportFromResponse,
@@ -9,19 +9,27 @@ const {
 
 const handler = (router, routesContext) => {
   router.get("/report", async (ctx, next) => {
-    const { settlementId } = qs.parse(ctx.request.querystring);
+    const { name } = qs.parse(ctx.request.querystring);
+    const { type } = qs.parse(ctx.request.querystring);
+
+    const query = qs.parse(ctx.request.querystring);
+    delete query["name"];
+    delete query["type"];
 
     const reportUrl = new URL(routesContext.config.reportUrls["settlement"]);
     routesContext.log(`Found report URL: ${reportUrl}`);
-    const completeUrl = `${reportUrl}?settlementId=${settlementId}`;
-    routesContext.log(`Generated report request: ${completeUrl}`);
-    const opts = {
-      method: "GET",
-    };
 
-    const filename = `report_settlementId-${settlementId}_${Date.now()}.xlsx`;
+    const reportParams = new URLSearchParams(query);
+    const completeUrl = `${reportUrl}${name}.${type}?${reportParams}`;
+    routesContext.log(`Generated report request: ${completeUrl}`);
+
+    const filename = `report_${name}_${Date.now()}.${type}`;
 
     try {
+      const opts = {
+        method: "GET",
+      };
+
       const response = await fetch(completeUrl, opts);
 
       if (response.status !== 200) {
