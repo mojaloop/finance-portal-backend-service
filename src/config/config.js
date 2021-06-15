@@ -39,8 +39,7 @@ const config = {
         reflectOrigin: process.env.CORS_ACCESS_CONTROL_REFLECT_ORIGIN === 'true',
     },
     reportUrls: {
-        312: process.env.HUB_REPORT_URL_312,
-        644: process.env.HUB_REPORT_URL_644,
+        settlement: process.env.SETTLEMENT_REPORT_URL,
     },
     featureFlags: {
         transferVerification: process.env.FEATURE_FLAG_TRANSFER_VERIFICATION === 'true',
