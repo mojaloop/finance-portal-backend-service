@@ -1,6 +1,12 @@
 // TODO: Remove previous line and work through linting issues at next edit
 
-const { writeFile, unlink, createWriteStream } = require("fs");
+const {
+  writeFile,
+  unlink,
+  createWriteStream,
+  access,
+  constants,
+} = require("fs");
 const { parse } = require("qs");
 const { json2csv } = require("json-2-csv");
 
@@ -55,6 +61,7 @@ const generateReportFromResponse = async (body, filename) => {
   await new Promise((resolve, reject) => {
     body.pipe(fileStream);
     body.on("error", reject);
+    body.end();
     fileStream.on("finish", resolve);
   });
 };
@@ -119,8 +126,12 @@ const generateReportUrl = async (res, url, reportId) => {
  * @returns {void}           Deletes the file.
  */
 const deleteSavedReportFile = async (filename) => {
-  unlink(filename, (err) => {
-    if (err) throw err;
+  access(filename, constants.F_OK, (e) => {
+    if (!e) {
+      unlink(filename, (err) => {
+        if (err) throw err;
+      });
+    }
   });
 };
 

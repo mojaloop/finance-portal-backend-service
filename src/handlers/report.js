@@ -11,6 +11,14 @@ const handler = (router, routesContext) => {
   router.get("/report", async (ctx, next) => {
     const { name } = qs.parse(ctx.request.querystring);
     const { type } = qs.parse(ctx.request.querystring);
+    
+    if (!name || !type) {
+      ctx.response.body = { error: "Query param is missing: [name, type]" };
+      ctx.response.status = 400;
+
+      await next();
+      return;
+    }
 
     const query = qs.parse(ctx.request.querystring);
     delete query["name"];
