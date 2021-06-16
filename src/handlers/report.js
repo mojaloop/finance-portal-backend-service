@@ -9,11 +9,10 @@ const {
 
 const handler = (router, routesContext) => {
     router.get('/report', async (ctx, next) => {
-        const { name } = qs.parse(ctx.request.querystring);
-        const { type } = qs.parse(ctx.request.querystring);
+        const { name, type } = qs.parse(ctx.request.querystring);
 
         if (!name || !type) {
-            ctx.response.body = { error: 'Query param is missing: [name, type]' };
+            ctx.response.body = { error: 'A required query param is missing. Required query params: [name, type]' };
             ctx.response.status = 400;
 
             await next();
@@ -58,8 +57,6 @@ const handler = (router, routesContext) => {
 
             await sendFile(ctx, filename);
         } catch (err) {
-            // eslint-disable-next-line no-console
-            console.log(err);
             routesContext.log(err);
 
             ctx.response.body = { error: 'Failed to get report!' };
