@@ -1,6 +1,6 @@
 {
   "name": "@mojaloop/finance-portal-backend-service",
-  "version": "15.0.2",
+  "version": "15.1.0",
   "description": "The backend service to support the finance portal web ui. Essentially a thin wrapper around SQL queries.",
   "license": "Apache-2.0",
   "contributors": [
