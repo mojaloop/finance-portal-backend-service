@@ -1,77 +1,78 @@
-const fetch = require("node-fetch");
-const qs = require("querystring");
-const sendFile = require("koa-send");
-const { URL, URLSearchParams } = require("url");
+const fetch = require('node-fetch');
+const qs = require('querystring');
+const sendFile = require('koa-send');
+const { URL, URLSearchParams } = require('url');
 const {
-  deleteSavedReportFile,
-  generateReportFromResponse,
-} = require("../lib/reportsUtil");
+    deleteSavedReportFile,
+    generateReportFromResponse,
+} = require('../lib/reportsUtil');
 
 const handler = (router, routesContext) => {
-  router.get("/report", async (ctx, next) => {
-    const { name } = qs.parse(ctx.request.querystring);
-    const { type } = qs.parse(ctx.request.querystring);
-    
-    if (!name || !type) {
-      ctx.response.body = { error: "Query param is missing: [name, type]" };
-      ctx.response.status = 400;
+    router.get('/report', async (ctx, next) => {
+        const { name } = qs.parse(ctx.request.querystring);
+        const { type } = qs.parse(ctx.request.querystring);
 
-      await next();
-      return;
-    }
+        if (!name || !type) {
+            ctx.response.body = { error: 'Query param is missing: [name, type]' };
+            ctx.response.status = 400;
 
-    const query = qs.parse(ctx.request.querystring);
-    delete query["name"];
-    delete query["type"];
+            await next();
+            return;
+        }
 
-    const reportUrl = new URL(routesContext.config.reportUrls["settlement"]);
-    routesContext.log(`Found report URL: ${reportUrl}`);
+        const query = qs.parse(ctx.request.querystring);
+        delete query.name;
+        delete query.type;
 
-    const reportParams = new URLSearchParams(query);
-    const completeUrl = `${reportUrl}${name}.${type}?${reportParams}`;
-    routesContext.log(`Generated report request: ${completeUrl}`);
+        const reportUrl = new URL(routesContext.config.reportUrls.settlement);
+        routesContext.log(`Found report URL: ${reportUrl}`);
 
-    const filename = `report_${name}_${Date.now()}.${type}`;
+        const reportParams = new URLSearchParams(query);
+        const completeUrl = `${reportUrl}${name}.${type}?${reportParams}`;
+        routesContext.log(`Generated report request: ${completeUrl}`);
 
-    try {
-      const opts = {
-        method: "GET",
-      };
+        const filename = `report_${name}_${Date.now()}.${type}`;
 
-      const response = await fetch(completeUrl, opts);
+        try {
+            const opts = {
+                method: 'GET',
+            };
 
-      if (response.status !== 200) {
-        ctx.response.body = { status: "No Content!" };
-        ctx.response.status = 204;
+            const response = await fetch(completeUrl, opts);
+
+            if (response.status !== 200) {
+                ctx.response.body = { status: 'No Content!' };
+                ctx.response.status = 204;
+                await next();
+                return;
+            }
+
+            await generateReportFromResponse(response.body, filename);
+
+            ctx.response.status = 200;
+            ctx.response.set({
+                'Content-Type':
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'Content-Disposition': `attachment; filename=${filename}`,
+            });
+
+            await sendFile(ctx, filename);
+        } catch (err) {
+            // eslint-disable-next-line no-console
+            console.log(err);
+            routesContext.log(err);
+
+            ctx.response.body = { error: 'Failed to get report!' };
+            ctx.response.status = 500;
+
+            await next();
+            return;
+        } finally {
+            await deleteSavedReportFile(filename);
+        }
+
         await next();
-        return;
-      }
-
-      await generateReportFromResponse(response.body, filename);
-
-      ctx.response.status = 200;
-      ctx.response.set({
-        "Content-Type":
-          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "Content-Disposition": "attachment; filename=" + filename,
-      });
-
-      await sendFile(ctx, filename);
-    } catch (err) {
-      console.log(err);
-      routesContext.log(err);
-
-      ctx.response.body = { error: "Failed to get report!" };
-      ctx.response.status = 500;
-
-      await next();
-      return;
-    } finally {
-      await deleteSavedReportFile(filename);
-    }
-
-    await next();
-  });
+    });
 };
 
 module.exports = handler;
