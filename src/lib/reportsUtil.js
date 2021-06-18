@@ -1,6 +1,12 @@
 // TODO: Remove previous line and work through linting issues at next edit
 
-const { writeFile, unlink } = require('fs');
+const {
+    writeFile,
+    unlink,
+    createWriteStream,
+    access,
+    constants,
+} = require('fs');
 const { parse } = require('qs');
 const { json2csv } = require('json-2-csv');
 
@@ -29,7 +35,8 @@ const reportIds = {
         'errorCode',
         'senderDFSPTxnID',
         'receiverDFSPTxnID',
-        'settlementWindowId'],
+        'settlementWindowId',
+    ],
 
     644: [
         'settlementWindowId',
@@ -40,6 +47,24 @@ const reportIds = {
         'netPosition',
         'state',
     ],
+};
+
+/**
+ * Save xlsx report.
+ *
+ * @param {Object} body      Response body from report request.
+ * @param {String} filename  Name of file to save.
+ * @returns {void}           Creates and saves file.
+ */
+const generateReportFromResponse = async (body, filename) => {
+    const fileStream = createWriteStream(filename);
+    await new Promise((resolve, reject) => {
+        body.pipe(fileStream);
+        body.on('error', reject);
+        fileStream.on('finish', resolve);
+    });
+    body.end();
+    fileStream.end();
 };
 
 /**
@@ -65,14 +90,17 @@ const generateReport = async (report, filename, reportId) => {
         keys: reportIds[reportId],
     };
 
-    json2csv(report, (err, csv) => {
-        if (err) throw err;
+    json2csv(
+        report,
+        (err, csv) => {
+            if (err) throw err;
 
-        writeFile(filename, csv, (err2) => {
-            if (err2) throw err2;
-        });
-    },
-    options);
+            writeFile(filename, csv, (err2) => {
+                if (err2) throw err2;
+            });
+        },
+        options,
+    );
 };
 
 /**
@@ -99,9 +127,18 @@ const generateReportUrl = async (res, url, reportId) => {
  * @returns {void}           Deletes the file.
  */
 const deleteSavedReportFile = async (filename) => {
-    unlink(filename, (err) => {
-        if (err) throw err;
+    access(filename, constants.F_OK, (e) => {
+        if (!e) {
+            unlink(filename, (err) => {
+                if (err) throw err;
+            });
+        }
     });
 };
 
-module.exports = { generateReport, generateReportUrl, deleteSavedReportFile };
+module.exports = {
+    generateReport,
+    generateReportUrl,
+    deleteSavedReportFile,
+    generateReportFromResponse,
+};

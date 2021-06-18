@@ -1,36 +1,44 @@
 const fetch = require('node-fetch');
 const qs = require('querystring');
 const sendFile = require('koa-send');
-const { URL } = require('url');
-
-const { generateReport, generateReportUrl, deleteSavedReportFile } = require('../lib/reportsUtil');
+const { URL, URLSearchParams } = require('url');
+const {
+    deleteSavedReportFile,
+    generateReportFromResponse,
+} = require('../lib/reportsUtil');
 
 const handler = (router, routesContext) => {
     router.get('/report', async (ctx, next) => {
-        const { reportId } = qs.parse(ctx.request.querystring);
+        const { name, type } = qs.parse(ctx.request.querystring);
 
-        if (!reportId === '312' || !reportId === '644') {
-            ctx.response.body = { error: 'Wrong report Id!' };
-            ctx.response.status = 404;
+        if (!name || !type) {
+            ctx.response.body = { error: 'A required query param is missing. Required query params: [name, type]' };
+            ctx.response.status = 400;
+
             await next();
             return;
         }
-        const authHeaderKey = Buffer.from(`${process.env.JASPER_USER}:${process.env.JASPER_PASSWORD}`).toString('base64');
 
-        const opts = {
-            method: 'GET',
-            headers: {
-                Authorization: `Basic ${authHeaderKey}`,
-            },
-        };
+        const query = qs.parse(ctx.request.querystring);
+        delete query.name;
+        delete query.type;
 
-        const reportUrl = new URL(routesContext.config.reportUrls[reportId]);
+        const reportUrl = new URL(routesContext.config.reportUrls.settlement);
         routesContext.log(`Found report URL: ${reportUrl}`);
-        const completeUrl = await generateReportUrl(ctx.request, reportUrl, reportId);
+
+        const reportParams = new URLSearchParams(query);
+        const completeUrl = `${reportUrl}${name}.${type}?${reportParams}`;
         routesContext.log(`Generated report request: ${completeUrl}`);
 
+        const filename = `report_${name}_${Date.now()}.${type}`;
+
         try {
+            const opts = {
+                method: 'GET',
+            };
+
             const response = await fetch(completeUrl, opts);
+
             if (response.status !== 200) {
                 ctx.response.body = { status: 'No Content!' };
                 ctx.response.status = 204;
@@ -38,17 +46,26 @@ const handler = (router, routesContext) => {
                 return;
             }
 
-            const report = await response.json();
-            const filename = `${reportId}_report_${Date.now()}.csv`;
-            await generateReport(report, filename, reportId);
+            await generateReportFromResponse(response.body, filename);
+
             ctx.response.status = 200;
+            ctx.response.set({
+                'Content-Type':
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'Content-Disposition': `attachment; filename=${filename}`,
+            });
+
             await sendFile(ctx, filename);
-            await deleteSavedReportFile(filename);
         } catch (err) {
+            routesContext.log(err);
+
             ctx.response.body = { error: 'Failed to get report!' };
             ctx.response.status = 500;
+
             await next();
             return;
+        } finally {
+            await deleteSavedReportFile(filename);
         }
 
         await next();
