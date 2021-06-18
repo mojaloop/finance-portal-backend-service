@@ -60,7 +60,7 @@ const generateReportFromResponse = async (body, filename) => {
     const fileStream = createWriteStream(filename);
     await new Promise((resolve, reject) => {
         body.pipe(fileStream);
-        body.on('error', reject);        
+        body.on('error', reject);
         fileStream.on('finish', resolve);
     });
     body.end();
