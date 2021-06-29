@@ -6,6 +6,11 @@
 
 The backend service to support the admin portal web ui. Essentially a thin wrapper around SQL queries.
 
+Run in development with `npm run dev`.
+
+You can filter logs through `pino-pretty`, or another ndjson viewer such as `jq` to obtain
+pretty-printed output. This also works with `kubectl log`.
+
 ## TODO
 * Make sure app.env is 'production' in production.  See: https://koajs.com/ 'Settings' section.
 * In development mode check for divergence between .env.template and .env and warn the user
@@ -16,18 +21,6 @@ The backend service to support the admin portal web ui. Essentially a thin wrapp
 * Check all mandatory environment and secrets are present before beginning operation. Print a
     useful error message informing that operation cannot continue if they are not.
 
-## Deploying to DEV environment
-* Make a PR to this repo and have it merged
-* Make a release on the repo with the release version of the form vX.Y.Z where X is the product
-    increment, Y is the sprint number, Z is an zero-based incrementing integer that is reset each
-    time Y is changed.
-
-## Installing
-```bash
-cd ./src
-npm install
-```
-
 ## External dependencies
 This service relies on external APIs in order to perform some operations regarding Forex transactions and delegation of the "commit settlement window" action.
 
@@ -35,18 +28,6 @@ These APIs are not part of the Mojaloop core, and their specific implementations
 Their endpoints are defined by these configuration values:
 * FXP_ENDPOINT
 * EXTERNAL_SETTLEMENTS_ENDPOINT
-
-## Push to the repo
-Follow the instructions from the Building section above, then:
-```bash
-make push
-```
-
-## Running containerised
-Follow the instructions from the Building section above, then:
-```bash
-make run
-```
 
 ## Running locally
 You'll need access to a mysql instance containing some central_ledger data, and a mojaloop deployment.
