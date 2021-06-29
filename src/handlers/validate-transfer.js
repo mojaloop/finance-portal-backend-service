@@ -16,7 +16,7 @@ const handler = (router, routesContext) => {
         const validMessage = await AzureLog
             .getTransferMessageWithJWSSignature(routesContext.config.azureLog,
                 ctx.params.transferId,
-                routesContext.log);
+                ctx.log);
         let isValidTransfer = false;
 
         if (validMessage != null) {
@@ -32,7 +32,7 @@ const handler = (router, routesContext) => {
             try {
                 isValidTransfer = pubKeys.some((pubKey) => JWT.verify(token, pubKey));
             } catch (err) {
-                routesContext.log(`Error validating JWS token: ${err.stack || util.inspect(err)}`);
+                ctx.log.error(`Error validating JWS token: ${err.stack || util.inspect(err)}`);
             }
         }
 

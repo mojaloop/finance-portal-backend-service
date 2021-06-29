@@ -9,7 +9,7 @@ const selfSignedAgent = new https.Agent({ rejectUnauthorized: false });
 const handler = (router, routesContext) => {
     router.put('/logout', async (ctx, next) => {
         const accessToken = ctx.request.get('Cookie').split('=').splice(1).join('');
-        routesContext.log(`revoking token - ${accessToken}- onlogout`);
+        ctx.log.info(`revoking token - ${accessToken}- onlogout`);
         const opts = {
             method: 'POST',
             headers: {

@@ -14,7 +14,6 @@ const handler = (router, routesContext) => {
                 routesContext.config.centralLedgerEndpoint,
                 ctx.params.participantName,
                 acc.currency,
-                routesContext.log,
             );
             acc.netDebitCap = limit.limit.value;
             return acc;
@@ -30,7 +29,6 @@ const handler = (router, routesContext) => {
             ctx.params.participantName,
             ctx.request.body.currency,
             ctx.request.body.newValue,
-            routesContext.log,
         );
         const accounts = await getParticipantAccounts(
             routesContext.config.centralLedgerEndpoint, ctx.params.participantName,
@@ -42,7 +40,6 @@ const handler = (router, routesContext) => {
                 routesContext.config.centralLedgerEndpoint,
                 ctx.params.participantName,
                 acc.currency,
-                routesContext.log,
             );
             acc.netDebitCap = limit.limit.value;
             return acc;

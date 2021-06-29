@@ -13,7 +13,6 @@ const handler = (router, routesContext) => {
                 ctx.request.body.amount,
                 ctx.request.body.currency,
                 'Admin portal funds out request',
-                routesContext.log,
             );
             ctx.response.status = 200;
         } catch (err) {
