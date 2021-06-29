@@ -30,9 +30,17 @@ class Database {
 
 const createDb = () => (new Database());
 
+const nullLogger = () => {};
+const createLogger = () => ({
+    warn: nullLogger,
+    info: nullLogger,
+    error: nullLogger,
+    child: createLogger,
+});
+
 const createServer = ({
     db,
-    logger = () => {},
+    logger = createLogger(),
     database,
     config = globalConfig,
 } = {}) => http.createServer(

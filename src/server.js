@@ -3,8 +3,8 @@ const Koa = require('koa');
 const koaBody = require('koa-body');
 const fetch = require('node-fetch');
 const https = require('https');
-const util = require('util');
 const Router = require('koa-router');
+const { randomPhrase } = require('sdk-standard-components');
 const { permit } = require('./lib/permissions');
 
 // TODO:
@@ -30,19 +30,15 @@ const createServer = (config, db, log, Database) => {
 
     // Log all requests
     app.use(async (ctx, next) => {
-        log(`Received: ${ctx.request.method} ${ctx.request.path}${ctx.request.search}`);
+        ctx.log = log.child({
+            id: randomPhrase(),
+            request: ctx.request,
+        });
+        ctx.log.info('request received');
         await next();
-        const pretty = (obj) => JSON.stringify(obj, null, 2);
-        const msg = (
-            'Handled request:\n'
-              + `${ctx.request.method} ${ctx.request.path}${ctx.request.search}\n`
-              + `${pretty(ctx.request.headers)}\n`
-              + `${pretty(ctx.request.body)}\n`
-              + `Response: HTTP ${ctx.response.status}\n`
-              + `${pretty(ctx.response.headers)}\n`
-              + `${pretty(ctx.response.body)}`
-        ).replace(/\n/g, '\n  ');
-        log(msg);
+        ctx.log.child({
+            response: ctx.response,
+        }).info('handled request');
     });
 
     // Allow any origin by echoing the origin back to the client
@@ -65,7 +61,7 @@ const createServer = (config, db, log, Database) => {
         try {
             await next();
         } catch (err) {
-            log('Unhandled error', util.inspect(err, { depth: 10 }));
+            ctx.log.child({ err }).error('Unhandled error');
             ctx.response.status = 500;
             ctx.response.body = { msg: 'Unhandled Internal Error' };
         }
@@ -110,12 +106,12 @@ const createServer = (config, db, log, Database) => {
     // TODO: authorise before handling CORS?
     app.use(async (ctx, next) => {
         if (ctx.request.path.split('/').pop() === 'login' && ctx.request.method.toLowerCase() === 'post') {
-            log('login request received - user will authenticate with login credentials - token validation not performed');
+            ctx.log.info('login request received - user will authenticate with login credentials - token validation not performed');
             await next();
             return;
         }
         if (config.auth.bypass) {
-            log('request token validation bypassed as per config');
+            ctx.log.info('request token validation bypassed as per config');
             await next();
             return;
         }
@@ -143,7 +139,7 @@ const createServer = (config, db, log, Database) => {
             return;
         }
 
-        log('validating request token:', token);
+        ctx.log.info('validating request token:', token);
         const opts = {
             method: 'POST',
             headers: {
@@ -156,35 +152,35 @@ const createServer = (config, db, log, Database) => {
         const authResponse = await fetch(config.auth.validateEndpoint, opts);
         if (authResponse.status !== 200) {
             const message = await authResponse.text();
-            log(`authorization server returned [${authResponse.status}]: ${message}`);
+            ctx.log.info(`authorization server returned [${authResponse.status}]: ${message}`);
             ctx.response.status = 401;
             ctx.response.body = { message: message || 'Unauthorized' };
             return;
         }
-        log(`authorization server returned [${authResponse.status}] response`);
-        log('token validated by authorization server');
+        ctx.log.info(`authorization server returned [${authResponse.status}] response`);
+        ctx.log.info('token validated by authorization server');
 
         const authResponseToken = await authResponse.json();
         const isValid = authResponseToken.active === true;
 
         if (!isValid) {
-            log('session expired');
+            ctx.log.info('session expired');
             ctx.response.status = 401; // TODO: 403?
             ctx.response.body = { message: 'Session expired' };
             return;
         }
 
         const isPermitted = await permit(
-            config.auth.userInfoEndpoint, token, ctx.request.method, ctx.request.path, log,
+            config.auth.userInfoEndpoint, token, ctx.request.method, ctx.request.path, ctx.log,
         );
         // user role/permissions
         if (!isPermitted) {
-            log('request forbidden according to application permissions');
+            ctx.log.info('request forbidden according to application permissions');
             ctx.response.body = { message: 'Forbidden' };
             ctx.response.status = 401;
             return;
         }
-        log('request permitted according to application permissions');
+        ctx.log.info('request permitted according to application permissions');
 
         await next();
     });
@@ -206,7 +202,6 @@ const createServer = (config, db, log, Database) => {
             route(...[router, {
                 config,
                 db,
-                log,
                 Database,
                 constants,
             }]);

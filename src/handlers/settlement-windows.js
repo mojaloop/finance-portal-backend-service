@@ -29,7 +29,7 @@ const handler = (router, routesContext) => {
             });
             settlementWindow.settlement = (settlement.length === 1 ? settlement[0] : {});
         } catch (error) {
-            routesContext.log(error);
+            ctx.log.error(error);
             settlementWindow.settlement = {};
         }
         ctx.response.body = settlementWindow;

@@ -1,5 +1,4 @@
 const casaLib = require('@mojaloop/finance-portal-lib');
-const util = require('util');
 
 const { getFxpRatesPerCurrencyChannel, createFxpRateForCurrencyChannel } = casaLib.admin.api;
 
@@ -15,7 +14,7 @@ const handler = (router, routesContext) => {
 
             await next();
         } catch (error) {
-            routesContext.log('Error', util.inspect(error, { depth: 10 }));
+            ctx.log.error(error);
             ctx.response.body = { msg: 'FXP API Error' };
             ctx.response.status = 502;
 
@@ -35,7 +34,7 @@ const handler = (router, routesContext) => {
 
             await next();
         } catch (error) {
-            routesContext.log('Error', util.inspect(error, { depth: 10 }));
+            ctx.log.error(error);
             ctx.response.body = { msg: 'FXP API Error' };
             ctx.response.status = 502;
 

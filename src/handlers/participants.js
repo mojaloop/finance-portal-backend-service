@@ -4,8 +4,7 @@ const { getParticipants, setParticipantIsActiveFlag } = casaLib.admin.api;
 
 const handler = (router, routesContext) => {
     router.get('/participants', async (ctx, next) => {
-        ctx.response.body = await getParticipants(routesContext.config.centralLedgerEndpoint,
-            routesContext.log);
+        ctx.response.body = await getParticipants(routesContext.config.centralLedgerEndpoint);
         ctx.response.status = 200;
         await next();
     });
@@ -23,7 +22,6 @@ const handler = (router, routesContext) => {
                 routesContext.config.centralLedgerEndpoint,
                 ctx.request.body.participantName,
                 ctx.request.body.isActive !== 0,
-                routesContext.log,
             );
         } catch (err) {
             ctx.response.body = await routesContext.db

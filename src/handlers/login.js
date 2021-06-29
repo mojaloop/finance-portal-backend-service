@@ -16,7 +16,7 @@ const handler = (router, routesContext) => {
 
     router.post('/login', async (ctx, next) => {
         if (routesContext.config.auth.bypass) {
-            routesContext.log('authentication bypassed');
+            ctx.log.warn('authentication bypassed');
             ctx.response.body = {
                 expiresIn: '3600',
             };

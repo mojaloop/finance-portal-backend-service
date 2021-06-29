@@ -16,7 +16,7 @@ const handler = (router, routesContext) => {
                 Number(settlementId),
             );
         } catch (error) {
-            routesContext.log('Settlement API Error', util.inspect(error, { depth: 10 }));
+            ctx.log.child({ error }).error('Settlement API Error');
             ctx.response.body = { msg: 'Settlement API Error' };
             ctx.response.status = 502;
 
@@ -41,7 +41,7 @@ const handler = (router, routesContext) => {
 
             [mostRecentSettlementWindow] = settlementWindows;
         } catch (error) {
-            routesContext.log(`An error occurred during getSettlementWindow: ${error.message}`);
+            ctx.log.child({ error }).error('An error occurred during getSettlementWindow');
         }
 
         ctx.response.body = mostRecentSettlementWindow || {};
