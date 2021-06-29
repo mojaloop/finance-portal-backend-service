@@ -1,5 +1,4 @@
 const portalLib = require('@mojaloop/finance-portal-lib');
-const util = require('util');
 const sleep = require('sleep-promise');
 
 const { commitSettlementWindow } = portalLib.admin.api;

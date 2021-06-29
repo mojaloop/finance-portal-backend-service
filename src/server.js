@@ -4,7 +4,7 @@ const koaBody = require('koa-body');
 const fetch = require('node-fetch');
 const https = require('https');
 const Router = require('koa-router');
-const { randomPhrase } = require('sdk-standard-components');
+const { randomPhrase } = require('@mojaloop/sdk-standard-components');
 const { permit } = require('./lib/permissions');
 
 // TODO:
