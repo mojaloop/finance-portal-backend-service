@@ -1,4 +1,4 @@
-FROM node:15-alpine3.13 AS builder
+FROM node:16-alpine3.13 AS builder
 WORKDIR /opt/finance-portal-backend-service
 
 COPY ./src/package.json ./src/package-lock.json /opt/finance-portal-backend-service/

@@ -10,7 +10,22 @@ const handler = (router, routesContext) => {
             routesContext.db.MYSQL_MAX_DATETIME,
         } = qs.parse(ctx.request.querystring);
         const api = new Model({ endpoint: routesContext.config.centralSettlementsEndpoint });
-        ctx.response.body = await api.getSettlements({ fromDateTime, toDateTime });
+        // Central settlement service returns an HTTP 400 response in the case that there are no
+        // settlements. The portal backend sanitises this response to an empty list.
+        // The offending code is here: https://github.com/mojaloop/central-settlement/blob/45ecfe32d1039870aa9572e23747c24cd6d53c86/src/domain/settlement/index.js#L215
+        try {
+            ctx.response.body = await api.getSettlements({ fromDateTime, toDateTime });
+        } catch (err) {
+            if (err?.constructor?.name === 'HTTPResponseError'
+             && err.getData().res.status === 400
+             && err.getData()?.resp?.errorInformation?.errorCode === '3100'
+             && err.getData()?.resp?.errorInformation?.errorDescription === 'Generic validation error - Settlements not found'
+            ) {
+                ctx.response.body = [];
+            } else {
+                throw err;
+            }
+        }
         ctx.response.status = 200;
         await next();
     });
