@@ -110,11 +110,6 @@ const createServer = (config, db, log, Database) => {
             await next();
             return;
         }
-        if (config.auth.bypass) {
-            ctx.log.info('request token validation bypassed as per config');
-            await next();
-            return;
-        }
 
         // The cookie _should_ look like:
         //   mojaloop-portal-token=abcde

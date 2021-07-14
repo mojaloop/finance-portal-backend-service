@@ -19,6 +19,7 @@ const logger = pino({
                 ...e,
                 body: e.raw.getData().resp,
                 request: e.raw.getData().request,
+                stack_arr: e.stack.split('\n').map((line) => line.trim()),
             };
         }),
     },
@@ -34,9 +35,6 @@ const db = new Database(config.db);
 if (config.cors.reflectOrigin && process.env.NODE_ENV !== 'development') {
     logger.warn('WARNING: NODE_ENV != \'development\' and CORS origin being reflected in Access-Control-Allow-Origin header. '
         + 'Changing CORS_ACCESS_CONTROL_REFLECT_ORIGIN to false is important for preventing CSRF.');
-}
-if (config.auth.bypass) {
-    logger.warn('WARNING: auth bypass enabled- all login requests will be approved');
 }
 
 // /////////////////////////////////////////////////////////////////////////////

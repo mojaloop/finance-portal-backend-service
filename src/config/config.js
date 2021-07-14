@@ -26,7 +26,6 @@ const config = {
     centralLedgerEndpoint: process.env.CENTRAL_LEDGER_ENDPOINT,
     settlementManagementEndpoint: process.env.SETTLEMENT_MANAGEMENT_ENDPOINT,
     auth: {
-        bypass: process.env.BYPASS_AUTH === 'true',
         loginEndpoint: (new URL(process.env.AUTH_SERVICE, `${process.env.AUTH_SERVER}:${process.env.AUTH_SERVER_PORT}`)).href,
         userInfoEndpoint: (new URL(process.env.USERINFO_SERVICE, `${process.env.AUTH_SERVER}:${process.env.AUTH_SERVER_PORT}`)).href,
         validateEndpoint: (new URL(process.env.VALIDATE_SERVICE, `${process.env.AUTH_SERVER}:${process.env.AUTH_SERVER_PORT}`)).href,

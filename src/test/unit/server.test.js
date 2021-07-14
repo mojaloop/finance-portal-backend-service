@@ -37,7 +37,6 @@ describe('server', () => {
 
     test('should return 401 for missing cookie header', async () => {
         const config = { ...globalConfig };
-        config.auth.bypass = false;
         const server = support.createServer({ db, config });
         const response = await request(server).get('/dfsps').unset('cookie');
         expect(response.statusCode).toBe(401);

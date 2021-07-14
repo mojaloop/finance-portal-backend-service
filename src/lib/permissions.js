@@ -14,7 +14,7 @@ const permit = async (userInfoURL, token, requestMethod, requestPath, log) => {
         agent: selfSignedAgent,
     };
     const userinfo = await fetch(userInfoURL, opts).then((res) => res.json());
-    log('Got userinfo:', userinfo);
+    log.info('Got userinfo:', userinfo);
 
     const usergroups = userinfo.groups ? userinfo.groups.split(',') : [];
     if (requestPath.includes('netdebitcap') && requestMethod === 'POST') {
@@ -26,9 +26,9 @@ const permit = async (userInfoURL, token, requestMethod, requestPath, log) => {
             return true;
         }
 
-        log('net debit cap update - user not authorised');
-        log('required role, one of:', ALLOWED_ROLES);
-        log('user roles:', usergroups);
+        log.warn('net debit cap update - user not authorised');
+        log.warn('required role, one of:', ALLOWED_ROLES);
+        log.warn('user roles:', usergroups);
         return false;
     }
 

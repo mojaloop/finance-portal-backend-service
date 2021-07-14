@@ -20,7 +20,7 @@ describe('permissions:', () => {
                 token = 'fake-token';
                 requestMethod = 'POST';
                 requestPath = 'fake-netdebitcap';
-                log = () => {};
+                log = { warn: () => {}, info: () => {} };
             });
 
             describe('Failures:', () => {
