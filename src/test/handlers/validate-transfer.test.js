@@ -77,8 +77,8 @@ describe('GET /validate-transfer/:transferId', () => {
                 .mockImplementation(jest.fn(() => false));
 
             const response = await request(server)
-                    .get(`/validate-transfer/${mockData.transferId}`)
-                    .set(support.mockTokenHeader);
+                .get(`/validate-transfer/${mockData.transferId}`)
+                .set(support.mockTokenHeader);
             expect(response.status).toEqual(200);
             expect(response.body).toEqual({
                 transfer: mockData.transferDetails,
@@ -93,8 +93,8 @@ describe('GET /validate-transfer/:transferId', () => {
                 .mockImplementation(jest.fn(() => true));
 
             const response = await request(server)
-                    .get(`/validate-transfer/${mockData.transferId}`)
-                    .set(support.mockTokenHeader);
+                .get(`/validate-transfer/${mockData.transferId}`)
+                .set(support.mockTokenHeader);
             expect(response.status).toEqual(200);
             expect(response.body).toEqual({
                 transfer: mockData.transferDetails,
