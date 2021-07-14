@@ -52,7 +52,8 @@
   "scripts": {
     "dev": "node index.js | pino-pretty",
     "start": "node index.js",
-    "test": "jest --ci --testMatch '**/test/**/*.test.js' --coverage",
+    "test": "jest --ci --testMatch '**/test/**/*.test.js'",
+    "test-coverage": "jest --ci --testMatch '**/test/**/*.test.js' --coverage",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   }

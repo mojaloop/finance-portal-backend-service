@@ -2,6 +2,9 @@ const request = require('supertest');
 const mockData = require('./mock-data');
 const support = require('./_support.js');
 
+jest.mock('node-fetch', () => () => require('./_support').mockAuthResponse);
+jest.mock('../../lib/permissions', () => ({ permit: jest.fn(() => true) }));
+
 let server;
 let db;
 
@@ -13,11 +16,6 @@ beforeEach(async () => {
 afterEach(async () => {
     server.close();
 });
-
-jest.genMockFromModule('node-fetch');
-jest.mock('node-fetch', () => jest.fn().mockImplementation(() => Promise.resolve({
-    staus: 200, statusText: 'OK', ok: true,
-})));
 
 const expectedNDC = [{
     currency: 'XOF',
@@ -52,13 +50,17 @@ jest.mock('@mojaloop/finance-portal-lib', () => ({
 
 describe('GET /netdebitcap/:participantName', () => {
     test('should respond with only active accounts', async () => {
-        const response = await request(server).get(`/netdebitcap/${mockData.participant}`);
+        const response = await request(server)
+            .get(`/netdebitcap/${mockData.participant}`)
+            .set(support.mockTokenHeader);
         expect(response.status).toEqual(200);
         expect(response.body).toEqual(expectedNDC);
     });
 
     test('should return 500 on error', async () => {
-        const response = await request(server).get('/netdebitcap/fakeParticipant');
+        const response = await request(server)
+            .get('/netdebitcap/fakeParticipant')
+            .set(support.mockTokenHeader);
         expect(response.status).toEqual(500);
     });
 });

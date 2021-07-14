@@ -168,7 +168,6 @@ const createServer = (config, db, log, Database) => {
         const isPermitted = await permit(
             config.auth.userInfoEndpoint, token, ctx.request.method, ctx.request.path, ctx.log,
         );
-        // user role/permissions
         if (!isPermitted) {
             ctx.log.info('request forbidden according to application permissions');
             ctx.response.body = { message: 'Forbidden' };
