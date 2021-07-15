@@ -3,6 +3,9 @@ const request = require('supertest');
 const mockData = require('./mock-data');
 const support = require('./_support.js');
 
+jest.mock('node-fetch', () => () => require('./_support').mockAuthResponse);
+jest.mock('../../lib/permissions', () => ({ permit: jest.fn(() => true) }));
+
 let server;
 let db;
 
@@ -27,7 +30,7 @@ describe('GET /forex/rates', () => {
             casaLib.admin.api.getFxpRatesPerCurrencyChannel
                 .mockImplementation(jest.fn(() => { throw new Error('foo'); }));
 
-            const response = await request(server).get('/forex/rates');
+            const response = await request(server).get('/forex/rates').set(support.mockTokenHeader);
             expect(response.status).toEqual(502);
             expect(response.body).toEqual({ msg: 'FXP API Error' });
         });
@@ -37,7 +40,7 @@ describe('GET /forex/rates', () => {
             casaLib.admin.api.getFxpRatesPerCurrencyChannel
                 .mockImplementation(jest.fn(() => Promise.resolve(mockData.fxpRates)));
 
-            const response = await request(server).get('/forex/rates');
+            const response = await request(server).get('/forex/rates').set(support.mockTokenHeader);
             expect(response.status).toEqual(200);
             expect(response.body).toEqual(mockData.fxpRates);
         });
@@ -56,7 +59,7 @@ describe('POST /forex/rates/:currencyPair', () => {
             casaLib.admin.api.createFxpRateForCurrencyChannel
                 .mockImplementation(jest.fn(() => { throw new Error('foo'); }));
 
-            const response = await request(server).post('/forex/rates/:currencyPair');
+            const response = await request(server).post('/forex/rates/:currencyPair').set(support.mockTokenHeader);
             expect(response.status).toEqual(502);
             expect(response.body).toEqual({ msg: 'FXP API Error' });
         });
@@ -66,7 +69,7 @@ describe('POST /forex/rates/:currencyPair', () => {
             casaLib.admin.api.createFxpRateForCurrencyChannel
                 .mockImplementation(jest.fn(() => Promise.resolve()));
 
-            const response = await request(server).post('/forex/rates/:currencyPair');
+            const response = await request(server).post('/forex/rates/:currencyPair').set(support.mockTokenHeader);
             expect(response.status).toEqual(204);
             expect(response.text).toEqual('');
             expect(response.body).toEqual({});

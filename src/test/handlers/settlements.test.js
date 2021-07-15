@@ -2,6 +2,9 @@ const portalLib = require('@mojaloop/finance-portal-lib');
 const request = require('supertest');
 const support = require('./_support');
 
+jest.mock('node-fetch', () => () => require('./_support').mockAuthResponse);
+jest.mock('../../lib/permissions', () => ({ permit: jest.fn(() => true) }));
+
 let server;
 let db;
 let mockSettlements;
@@ -21,7 +24,8 @@ afterEach(async () => {
 describe('GET /settlements', () => {
     test('should return the list of settlements', async () => {
         const response = await request(server)
-            .get('/settlements?fromDateTime=\'2019-07-29\'&toDateTime=\'2019-07-30\'');
+            .get('/settlements?fromDateTime=\'2019-07-29\'&toDateTime=\'2019-07-30\'')
+            .set(support.mockTokenHeader);
         expect(response.status).toEqual(200);
         const expectedList = mockSettlements;
         expect(response.body).toEqual(expectedList);
@@ -47,7 +51,8 @@ describe('GET /settlements', () => {
             },
         }));
         const response = await request(server)
-            .get('/settlements?fromDateTime=\'2019-07-29\'&toDateTime=\'2019-07-30\'');
+            .get('/settlements?fromDateTime=\'2019-07-29\'&toDateTime=\'2019-07-30\'')
+            .set(support.mockTokenHeader);
         expect(response.status).toEqual(200);
         const expectedList = mockSettlements;
         expect(response.body).toEqual(expectedList);

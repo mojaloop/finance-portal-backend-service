@@ -110,11 +110,6 @@ const createServer = (config, db, log, Database) => {
             await next();
             return;
         }
-        if (config.auth.bypass) {
-            ctx.log.info('request token validation bypassed as per config');
-            await next();
-            return;
-        }
 
         // The cookie _should_ look like:
         //   mojaloop-portal-token=abcde
@@ -173,7 +168,6 @@ const createServer = (config, db, log, Database) => {
         const isPermitted = await permit(
             config.auth.userInfoEndpoint, token, ctx.request.method, ctx.request.path, ctx.log,
         );
-        // user role/permissions
         if (!isPermitted) {
             ctx.log.info('request forbidden according to application permissions');
             ctx.response.body = { message: 'Forbidden' };

@@ -5,6 +5,9 @@ const support = require('./_support.js');
 
 const azureLog = require('../../lib/azureLogUtil');
 
+jest.mock('node-fetch', () => () => require('./_support').mockAuthResponse);
+jest.mock('../../lib/permissions', () => ({ permit: jest.fn(() => true) }));
+
 let server;
 let db;
 
@@ -36,7 +39,9 @@ describe('GET /validate-transfer/:transferId', () => {
                 .getTransferDetails
                 .mockImplementation(jest.fn(() => { throw new Error('foo'); }));
 
-            const response = await request(server).get(`/validate-transfer/${mockData.transferId}`);
+            const response = await request(server)
+                .get(`/validate-transfer/${mockData.transferId}`)
+                .set(support.mockTokenHeader);
             expect(response.status).toEqual(500);
             expect(response.body).toEqual({ msg: 'Unhandled Internal Error' });
         });
@@ -45,7 +50,9 @@ describe('GET /validate-transfer/:transferId', () => {
                 .getTransferMessageWithJWSSignature
                 .mockImplementation(jest.fn(() => { throw new Error('foo'); }));
 
-            const response = await request(server).get(`/validate-transfer/${mockData.transferId}`);
+            const response = await request(server)
+                .get(`/validate-transfer/${mockData.transferId}`)
+                .set(support.mockTokenHeader);
             expect(response.status).toEqual(500);
             expect(response.body).toEqual({ msg: 'Unhandled Internal Error' });
         });
@@ -55,7 +62,9 @@ describe('GET /validate-transfer/:transferId', () => {
                     .verify
                     .mockImplementation(jest.fn(() => { throw new Error('foo'); }));
 
-                const response = await request(server).get(`/validate-transfer/${mockData.transferId}`);
+                const response = await request(server)
+                    .get(`/validate-transfer/${mockData.transferId}`)
+                    .set(support.mockTokenHeader);
                 expect(response.status).toEqual(200);
             });
         });
@@ -67,7 +76,9 @@ describe('GET /validate-transfer/:transferId', () => {
                 .verify
                 .mockImplementation(jest.fn(() => false));
 
-            const response = await request(server).get(`/validate-transfer/${mockData.transferId}`);
+            const response = await request(server)
+                .get(`/validate-transfer/${mockData.transferId}`)
+                .set(support.mockTokenHeader);
             expect(response.status).toEqual(200);
             expect(response.body).toEqual({
                 transfer: mockData.transferDetails,
@@ -81,7 +92,9 @@ describe('GET /validate-transfer/:transferId', () => {
                 .verify
                 .mockImplementation(jest.fn(() => true));
 
-            const response = await request(server).get(`/validate-transfer/${mockData.transferId}`);
+            const response = await request(server)
+                .get(`/validate-transfer/${mockData.transferId}`)
+                .set(support.mockTokenHeader);
             expect(response.status).toEqual(200);
             expect(response.body).toEqual({
                 transfer: mockData.transferDetails,

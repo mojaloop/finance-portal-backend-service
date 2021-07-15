@@ -47,8 +47,21 @@ const createServer = ({
     appCreateServer(config, db, logger, database).callback(),
 );
 
+const mockAuthResponseBody = {
+    access_token: 'mock-access-token',
+    active: true,
+};
+
+const mockAuthResponse = {
+    status: 200,
+    json: () => mockAuthResponseBody,
+};
+
 module.exports = {
     createDb,
     createServer,
     Database,
+    mockTokenHeader: { Cookie: 'mojaloop-portal-token=abcde' },
+    mockAuthResponseBody,
+    mockAuthResponse,
 };

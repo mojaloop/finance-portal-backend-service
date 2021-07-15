@@ -3,6 +3,7 @@
     "jest": true
   },
   "rules": {
-    "import/extensions": "off"
+    "import/extensions": "off",
+    "global-require": "off"
   }
 }

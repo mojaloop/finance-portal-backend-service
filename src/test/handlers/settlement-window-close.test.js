@@ -3,6 +3,9 @@ const axios = require('axios');
 const mockData = require('./mock-data');
 const support = require('./_support');
 
+jest.mock('node-fetch', () => () => require('./_support').mockAuthResponse);
+jest.mock('../../lib/permissions', () => ({ permit: jest.fn(() => true) }));
+
 let server;
 let db;
 
@@ -22,7 +25,8 @@ describe('PUT /settlement-window-close/:settlementWindowId', () => {
             status: 200, statusText: 'OK', ok: true,
         }));
         const response = await request(server)
-            .put(`/settlement-window-close/${mockData.settleSettlementWindow.request[2].settlementWindowId}`);
+            .put(`/settlement-window-close/${mockData.settleSettlementWindow.request[2].settlementWindowId}`)
+            .set(support.mockTokenHeader);
         expect(response.status).toEqual(200);
         const expectedWindowList = mockData.settlementWindowList;
         expect(response.body).toEqual(expectedWindowList);
@@ -35,7 +39,8 @@ describe('PUT /settlement-window-close/:settlementWindowId', () => {
         }));
         const response = await request(server)
             .put(`/settlement-window-close/${mockData.settleSettlementWindow.request[2].settlementWindowId}`)
-            .send(mockData.settleSettlementWindow.request[2].body);
+            .send(mockData.settleSettlementWindow.request[2].body)
+            .set(support.mockTokenHeader);
         expect(response.status).toEqual(403);
         expect(response.body).toEqual(data);
     });
@@ -44,7 +49,8 @@ describe('PUT /settlement-window-close/:settlementWindowId', () => {
         axios.post = jest.fn().mockImplementationOnce(() => Promise.reject(new Error('Error')));
         const response = await request(server)
             .put(`/settlement-window-close/${mockData.settleSettlementWindow.request[2].settlementWindowId}`)
-            .send(mockData.settleSettlementWindow.request[2].body);
+            .send(mockData.settleSettlementWindow.request[2].body)
+            .set(support.mockTokenHeader);
         expect(response.status).toEqual(500);
     });
 });

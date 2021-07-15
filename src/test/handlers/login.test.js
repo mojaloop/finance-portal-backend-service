@@ -12,7 +12,7 @@ jest.mock('node-fetch');
 
 describe('POST /login', () => {
     test('should respond with insecure directives when cookie is set to insecure', async () => {
-        const config = { ...globalConfig, insecureCookie: true, auth: { bypass: false } };
+        const config = { ...globalConfig, insecureCookie: true };
         const server = support.createServer({ db: support.createDb(), config });
         const access_token = 'whatever';
         fetch.mockReturnValue(Promise.resolve(new Response(JSON.stringify({ access_token }))));
@@ -22,7 +22,7 @@ describe('POST /login', () => {
     });
 
     test('should respond with secure directives when cookie is not set to insecure', async () => {
-        const config = { ...globalConfig, insecureCookie: false, auth: { bypass: false } };
+        const config = { ...globalConfig, insecureCookie: false };
         const server = support.createServer({ db: support.createDb(), config });
         const access_token = 'whatever';
         fetch.mockReturnValue(Promise.resolve(new Response(JSON.stringify({ access_token }))));

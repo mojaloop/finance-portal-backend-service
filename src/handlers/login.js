@@ -15,19 +15,6 @@ const handler = (router, routesContext) => {
     );
 
     router.post('/login', async (ctx, next) => {
-        if (routesContext.config.auth.bypass) {
-            ctx.log.warn('authentication bypassed');
-            ctx.response.body = {
-                expiresIn: '3600',
-            };
-            ctx.response.set({
-                'Set-Cookie': cookieDirectives('bypassed', routesContext.config.insecureCookie),
-            });
-            ctx.response.status = 200;
-            await next();
-            return;
-        }
-
         const { username, password } = ctx.request.body;
         const opts = {
             method: 'POST',

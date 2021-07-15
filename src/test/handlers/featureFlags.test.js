@@ -1,6 +1,10 @@
 const request = require('supertest');
+
 const globalConfig = require('../../config/config.js');
 const support = require('./_support.js');
+
+jest.mock('node-fetch', () => () => require('./_support').mockAuthResponse);
+jest.mock('../../lib/permissions', () => ({ permit: jest.fn(() => true) }));
 
 describe('GET /featureflags', () => {
     test('should return 200 and false for transferVerification when config is set to "false"', async () => {
@@ -10,7 +14,7 @@ describe('GET /featureflags', () => {
         const db = support.createDb();
         const server = support.createServer({ db, config });
 
-        const response = await request(server).get('/featureflags');
+        const response = await request(server).get('/featureflags').set(support.mockTokenHeader);
         expect(response.status).toEqual(200);
         expect(response.body).toEqual({
             transferVerification: false,
@@ -26,7 +30,7 @@ describe('GET /featureflags', () => {
         const db = support.createDb();
         const server = support.createServer({ db, config });
 
-        const response = await request(server).get('/featureflags');
+        const response = await request(server).get('/featureflags').set(support.mockTokenHeader);
         expect(response.status).toEqual(200);
         expect(response.body).toEqual({
             transferVerification: true,
@@ -44,7 +48,7 @@ describe('GET /featureflags', () => {
         const db = support.createDb();
         const server = support.createServer({ db, config });
 
-        const response = await request(server).get('/featureflags');
+        const response = await request(server).get('/featureflags').set(support.mockTokenHeader);
         expect(response.status).toEqual(200);
         expect(response.body).toEqual({
             transferVerification: true,

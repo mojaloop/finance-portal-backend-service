@@ -5,6 +5,9 @@ const handlerHelpers = require('../../lib/handlerHelpers');
 const mockData = require('./mock-data');
 const support = require('./_support.js');
 
+jest.mock('node-fetch', () => () => require('./_support').mockAuthResponse);
+jest.mock('../../lib/permissions', () => ({ permit: jest.fn(() => true) }));
+
 let server;
 let db;
 
@@ -40,7 +43,8 @@ describe('PUT /settlement-window-commit/:settlementWindowId', () => {
 
             const response = await request(server)
                 .put(`/settlement-window-commit/${targetSettlementWindowId}`)
-                .send(targetBody);
+                .send(targetBody)
+                .set(support.mockTokenHeader);
             expect(response.status).toEqual(502);
             expect(response.body).toEqual({ msg: 'Settlement API Error' });
         });
@@ -52,7 +56,8 @@ describe('PUT /settlement-window-commit/:settlementWindowId', () => {
 
             const response = await request(server)
                 .put(`/settlement-window-commit/${targetSettlementWindowId}`)
-                .send(targetBody);
+                .send(targetBody)
+                .set(support.mockTokenHeader);
             expect(response.status).toEqual(200);
             expect(response.body).toEqual({});
         });
@@ -69,7 +74,8 @@ describe('PUT /settlement-window-commit/:settlementWindowId', () => {
 
             const response = await request(server)
                 .put(`/settlement-window-commit/${targetSettlementWindowId}`)
-                .send(targetBody);
+                .send(targetBody)
+                .set(support.mockTokenHeader);
             expect(response.status).toEqual(200);
             expect(response.body).toEqual(mockData.settlementWindowList[0]);
         });
