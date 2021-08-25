@@ -16,9 +16,9 @@ const handler = (router, routesContext) => {
             return;
         }
         const reportUrl = new URL(routesContext.config.reportUrls[reportId]);
-        routesContext.log(`Found report URL: ${reportUrl}`);
+        ctx.log.info(`Found report URL: ${reportUrl}`);
         const completeUrl = await generateReportUrl(ctx.request, reportUrl, reportId);
-        routesContext.log(`Generated report request: ${completeUrl}`);
+        ctx.log.info(`Generated report request: ${completeUrl}`);
 
         try {
             const response = await axios.get(completeUrl);
