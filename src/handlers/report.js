@@ -1,4 +1,4 @@
-const fetch = require('node-fetch');
+const axios = require('axios');
 const qs = require('querystring');
 const sendFile = require('koa-send');
 const { URL } = require('url');
@@ -15,22 +15,13 @@ const handler = (router, routesContext) => {
             await next();
             return;
         }
-        const authHeaderKey = Buffer.from(`${process.env.JASPER_USER}:${process.env.JASPER_PASSWORD}`).toString('base64');
-
-        const opts = {
-            method: 'GET',
-            headers: {
-                Authorization: `Basic ${authHeaderKey}`,
-            },
-        };
-
         const reportUrl = new URL(routesContext.config.reportUrls[reportId]);
-        ctx.log.info(`Found report URL: ${reportUrl}`);
+        routesContext.log(`Found report URL: ${reportUrl}`);
         const completeUrl = await generateReportUrl(ctx.request, reportUrl, reportId);
-        ctx.log.info(`Generated report request: ${completeUrl}`);
+        routesContext.log(`Generated report request: ${completeUrl}`);
 
         try {
-            const response = await fetch(completeUrl, opts);
+            const response = await axios.get(completeUrl);
             if (response.status !== 200) {
                 ctx.response.body = { status: 'No Content!' };
                 ctx.response.status = 204;
@@ -38,9 +29,9 @@ const handler = (router, routesContext) => {
                 return;
             }
 
-            const report = await response.json();
+            const report = response.data;
             const filename = `${reportId}_report_${Date.now()}.csv`;
-            await generateReport(report, filename, reportId);
+            await generateReport(report, filename);
             ctx.response.status = 200;
             await sendFile(ctx, filename);
             await deleteSavedReportFile(filename);
