@@ -4,6 +4,8 @@ const { sumAllParticipants, convertParticipantsAmountsToStrings } = require('./l
 const MYSQL_MIN_DATETIME = '1000-01-01';
 const MYSQL_MAX_DATETIME = '9999-12-31';
 
+const util = require('util');
+
 const previousSettlementWindowDataQuery = `
   SELECT id,
     MAX(payments) AS payments,
@@ -521,6 +523,47 @@ GROUP BY settlementWindowId, accountCurrency
 ORDER BY settlementWindowId DESC
 `;
 
+const findTransfersQuery = `
+SELECT
+    qpPayer.fspid as payerFspid,
+    qpPayee.fspid as payeeFspid,
+    q.transactionReferenceId as transferId,
+    tS.name as transactionType,
+    q.createdDate as quoteTimestamp,
+    t.createdDate as transferTimestamp,
+    pITPayer.name as payerIdType,
+    qpPayer.partyIdentifierValue as payerIdValue,
+    pITPayee.name as payeeIdType,
+    qpPayee.partyIdentifierValue as payeeIdValue,
+    q.amount as amount,
+    c.currencyId as currency,
+    IFNULL(ts.enumeration, 'QUOTE ONLY') as state
+FROM
+    quote q
+    INNER JOIN quoteParty qpPayer on qpPayer.quoteId = q.quoteId AND qpPayer.partyTypeId = (SELECT partyTypeId FROM partyType WHERE name = 'PAYER')
+        INNER JOIN partyIdentifierType pITPayer ON pITPayer.partyIdentifierTypeId = qpPayer.partyIdentifierTypeId
+    INNER JOIN quoteParty qpPayee on qpPayee.quoteId = q.quoteId AND qpPayee.partyTypeId = (SELECT partyTypeId FROM partyType WHERE name = 'PAYEE')
+        INNER JOIN partyIdentifierType pITPayee ON pITPayee.partyIdentifierTypeId = qpPayee.partyIdentifierTypeId
+    INNER JOIN transactionScenario tS on tS.transactionScenarioId = q.transactionScenarioId
+    INNER JOIN currency c ON c.currencyId = q.currencyId
+
+    LEFT JOIN transfer t on t.transferId = q.transactionReferenceId
+    LEFT JOIN transferFulfilment tF on tF.transferId = t.transferId
+    LEFT JOIN (SELECT MAX(transferStateChangeId) as tscId, transferId FROM transferStateChange GROUP BY transferId ORDER BY transferId) tscid ON tscid.transferId = t.transferId
+    LEFT JOIN transferStateChange tsc ON tsc.transferStateChangeId = tscid.tscId
+    LEFT JOIN transferState ts ON ts.transferStateId = tsc.transferStateId
+    WHERE
+        transactionReferenceId LIKE ?
+        AND qpPayer.fspid LIKE ?
+        AND qpPayee.fspid LIKE ?
+        AND pITPayer.name LIKE ?
+        AND pITPayee.name LIKE ?
+        AND qpPayer.partyIdentifierValue LIKE ?
+        AND qpPayee.partyIdentifierValue LIKE ?
+        AND q.createdDate BETWEEN ? AND ?
+    LIMIT 1000
+`;
+
 module.exports = class Database {
     constructor(config) {
         this.connection = mysql.createPool({
@@ -533,6 +576,28 @@ module.exports = class Database {
         this.MYSQL_MAX_DATETIME = MYSQL_MAX_DATETIME;
         this.MYSQL_MIN_DATETIME = MYSQL_MIN_DATETIME;
     }
+
+    async getTransfers(filter) {
+        // make an array of query params
+        console.log(`filter: ${util.inspect(filter)}`);
+        const params = [
+            `%${filter.transferId ? filter.transferId : ''}%`,
+            `%${filter.payerFspid ? filter.payerFspid : ''}%`,
+            `%${filter.payeeFspid ? filter.payeeFspid : ''}%`,
+            `%${filter.payerIdType ? filter.payerIdType : ''}%`,
+            `%${filter.payeeIdType ? filter.payeeIdType : ''}%`,
+            `%${filter.payerIdValue ? filter.payerIdValue : ''}%`,
+            `%${filter.payeeIdValue ? filter.payeeIdValue : ''}%`,
+            filter.from ? new Date(filter.from) : new Date(0),
+            filter.to ? new Date(filter.to) : new Date(),
+        ];
+
+        console.log(`params: ${util.inspect(params)}`);
+
+        const [result] = await this.connection.query(findTransfersQuery, params);
+        return result;
+    }
+
 
     // TODO: in this query we get multiple results returned per (dfsp,currency). We should only
     // really get a single result per (dfsp,currency). This is happening because all historical

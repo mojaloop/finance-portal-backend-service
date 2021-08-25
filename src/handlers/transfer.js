@@ -10,6 +10,17 @@ const handler = (router, routesContext) => {
         }
         await next();
     });
+
+    router.get('/transfers', async (ctx, next) => {
+        const res = await routesContext.db.getTransfers(ctx.query);
+        if(res === null) {
+            ctx.response.body = [];
+        }
+        else {
+            ctx.response.body = res;
+        }
+        await next();
+    });
 };
 
 module.exports = handler;
