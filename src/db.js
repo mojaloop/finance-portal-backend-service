@@ -564,6 +564,10 @@ FROM
     LIMIT 1000
 `;
 
+const transferDetailsQuery = `
+
+`;
+
 module.exports = class Database {
     constructor(config) {
         this.connection = mysql.createPool({
@@ -577,9 +581,12 @@ module.exports = class Database {
         this.MYSQL_MIN_DATETIME = MYSQL_MIN_DATETIME;
     }
 
+    async getTransferDetails(transferId) {
+        const [result] = await this.connection.query(transferDetailsQuery, [transferId]);
+        return result;
+    }
+
     async getTransfers(filter) {
-        // make an array of query params
-        console.log(`filter: ${util.inspect(filter)}`);
         const params = [
             `%${filter.transferId ? filter.transferId : ''}%`,
             `%${filter.payerFspid ? filter.payerFspid : ''}%`,
@@ -591,8 +598,6 @@ module.exports = class Database {
             filter.from ? new Date(filter.from) : new Date(0),
             filter.to ? new Date(filter.to) : new Date(),
         ];
-
-        console.log(`params: ${util.inspect(params)}`);
 
         const [result] = await this.connection.query(findTransfersQuery, params);
         return result;
