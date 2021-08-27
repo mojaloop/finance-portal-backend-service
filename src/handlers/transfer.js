@@ -23,7 +23,7 @@ const handler = (router, routesContext) => {
     });
 
     router.get('/transferDetails/:transferId', async(ctx, next) => {
-        const res = await routesContext.db.getTransferDetails(ctx.params.transferId);
+        const res = await routesContext.db.getTransferAllDetails(ctx.params.transferId);
 
         if (res === null) {
             ctx.response.body = { message: 'Transfer not found' };

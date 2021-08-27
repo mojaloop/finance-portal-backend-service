@@ -564,9 +564,143 @@ FROM
     LIMIT 1000
 `;
 
-const transferDetailsQuery = `
+const transferAllDetailsQueries = {
+    quoteRequests: `SELECT
+            q.quoteId as quoteId,
+            q.transactionReferenceId as transactionReferenceId,
+            q.transactionRequestId as transactionRequestId,
+            q.note as note,
+            q.expirationDate as expirationDate,
+            q.amount as amount,
+            q.createdDate as createdDate,
+            ti.name as transactionInitiator,
+            tit.name as transactionInitiatorType,
+            ts.name as transactionScenario,
+            tss.name as transactionSubScenario,
+            bop.name as balanceOfPaymentsType,
+            at.name as amountType,
+            q.currencyId as currency
+        FROM
+            quote q
+            INNER JOIN transactionInitiator ti on ti.transactionInitiatorId = q.transactionInitiatorId
+            INNER JOIN transactionInitiatorType tit on tit.transactionInitiatorTypeId = q.transactionInitiatorTypeId
+            INNER JOIN transactionScenario ts on ts.transactionScenarioId = q.transactionScenarioId
+            INNER JOIN amountType at on at.amountTypeId = q.amountTypeId
 
-`;
+            LEFT JOIN balanceOfPayments bop on bop.balanceOfPaymentsId = q.balanceOfPaymentsId
+            LEFT JOIN transactionSubScenario tss on tss.transactionSubScenarioId = q.transactionSubScenarioId
+        WHERE
+            q.transactionReferenceId = ?`,
+    quoteParties: `SELECT 
+            quoteParty.quoteId,
+            partyIdentifierType.name as partyIdentifierType,
+            quoteParty.partyIdentifierValue,
+            quoteParty.fspId,
+            quoteParty.merchantClassificationCode,
+            quoteParty.partyName,
+            transferParticipantRoleType.name as transferParticipantRoleType,
+            ledgerEntryType.name as ledgerEntryType,
+            quoteParty.amount,
+            quoteParty.currencyId,
+            quoteParty.createdDate,
+            quoteParty.partySubIdOrTypeId,
+            participant.name as participant
+        FROM
+            quoteParty
+            INNER JOIN partyIdentifierType ON quoteParty.partyIdentifierTypeId = partyIdentifierType.partyIdentifierTypeId
+            INNER JOIN transferParticipantRoleType ON quoteParty.transferParticipantRoleTypeId = transferParticipantRoleType.transferParticipantRoleTypeId
+            INNER JOIN ledgerEntryType ON quoteParty.ledgerEntryTypeId = ledgerEntryType.ledgerEntryTypeId
+            INNER JOIN participant ON quoteParty.participantId = participant.participantId
+            INNER JOIN quote ON quoteParty.quoteId = quote.quoteId
+        WHERE
+            quote.transactionReferenceId = ?`,
+    quoteResponses: `SELECT 
+            quote.quoteId,
+            quote.transactionReferenceId,
+            quoteResponse.quoteResponseId,
+            quoteResponse.transferAmountCurrencyId,
+            quoteResponse.transferAmount,
+            quoteResponse.payeeReceiveAmountCurrencyId,
+            quoteResponse.payeeReceiveAmount,
+            quoteResponse.payeeFspFeeCurrencyId,
+            quoteResponse.payeeFspFeeAmount,
+            quoteResponse.payeeFspCommissionCurrencyId,
+            quoteResponse.payeeFspCommissionAmount,
+            quoteResponse.ilpCondition,
+            quoteResponse.responseExpirationDate,
+            quoteResponse.isValid,
+            quoteResponse.createdDate,
+            quoteResponseIlpPacket.value as ilpPacket
+        FROM
+            quoteResponse
+            INNER JOIN quote ON quoteResponse.quoteId = quote.quoteId
+            INNER JOIN quoteResponseIlpPacket ON quoteResponseIlpPacket.quoteResponseId = quoteResponse.quoteResponseId
+        WHERE
+            quote.transactionReferenceId = ?`,
+    quoteErrors: `SELECT 
+            quoteError.quoteErrorId,
+            quoteError.quoteId,
+            quoteError.quoteResponseId,
+            quoteError.errorCode,
+            quoteError.errorDescription,
+            quoteError.createdDate,
+            quote.transactionReferenceId
+        FROM
+            quoteError
+            INNER JOIN quoteResponse ON quoteError.quoteResponseId = quoteResponse.quoteResponseId
+            INNER JOIN quote ON quoteError.quoteId = quote.quoteId
+        WHERE
+            quote.transactionReferenceId = ?`,
+    transferPrepares: `SELECT
+            transfer.transferId, 
+            transfer.amount, 
+            transfer.currencyId, 
+            transfer.ilpCondition, 
+            transfer.expirationDate, 
+            transfer.createdDate
+        FROM
+            transfer
+        WHERE
+            transfer.transferId = ?`,
+    transferFulfilments: `SELECT
+            transferFulfilment.transferId, 
+            transferFulfilment.ilpFulfilment, 
+            transferFulfilment.completedDate, 
+            transferFulfilment.isValid, 
+            transferFulfilment.settlementWindowId, 
+            transferFulfilment.createdDate
+        FROM
+            transferFulfilment
+        WHERE
+            transferFulfilment.transferId = ?`,
+    transferParticipants: `SELECT 
+            transferParticipant.transferParticipantId,
+            transferParticipant.transferId,
+            transferParticipant.participantCurrencyId,
+            transferParticipantRoleType.name as transferParticipantRoleType,
+            ledgerEntryType.name as ledgerEntryType,
+            transferParticipant.amount,
+            transferParticipant.createdDate
+        FROM
+            transferParticipant
+            INNER JOIN transferParticipantRoleType ON transferParticipant.transferParticipantRoleTypeId = transferParticipantRoleType.transferParticipantRoleTypeId
+            INNER JOIN ledgerEntryType ON transferParticipant.ledgerEntryTypeId = ledgerEntryType.ledgerEntryTypeId
+        WHERE
+            transferParticipant.transferId = ?`,
+    transferStateChanges: `SELECT
+            transferStateChange.transferStateChangeId, 
+            transferStateChange.transferId, 
+            transferState.enumeration,
+            transferState.description,
+            transferStateChange.reason, 
+            transferStateChange.createdDate
+        FROM
+            transferStateChange
+            INNER JOIN transferState ON transferStateChange.transferStateId = transferState.transferStateId
+        WHERE
+            transferStateChange.transferId = ?
+        ORDER BY transferStateChange.transferStateChangeId`
+};
 
 module.exports = class Database {
     constructor(config) {
@@ -581,9 +715,36 @@ module.exports = class Database {
         this.MYSQL_MIN_DATETIME = MYSQL_MIN_DATETIME;
     }
 
-    async getTransferDetails(transferId) {
-        const [result] = await this.connection.query(transferDetailsQuery, [transferId]);
-        return result;
+    async getTransferAllDetails(transferId) {
+        const [[quoteRequests],
+            [quoteParties],
+            [quoteResponses],
+            [quoteErrors],
+            [transferPrepares],
+            [transferFulfilments],
+            [transferParticipants],
+            [transferStateChanges]] = await Promise.all([
+            this.connection.query(transferAllDetailsQueries.quoteRequests, [transferId]),
+            this.connection.query(transferAllDetailsQueries.quoteParties, [transferId]),
+            this.connection.query(transferAllDetailsQueries.quoteResponses, [transferId]),
+            this.connection.query(transferAllDetailsQueries.quoteErrors, [transferId]),
+            this.connection.query(transferAllDetailsQueries.transferPrepares, [transferId]),
+            this.connection.query(transferAllDetailsQueries.transferFulfilments, [transferId]),
+            this.connection.query(transferAllDetailsQueries.transferParticipants, [transferId]),
+            this.connection.query(transferAllDetailsQueries.transferStateChanges, [transferId]),
+        ]);
+
+        return {
+            transferId,
+            quoteRequests,
+            quoteParties,
+            quoteResponses,
+            quoteErrors,
+            transferPrepares,
+            transferFulfilments,
+            transferParticipants,
+            transferStateChanges,
+        };
     }
 
     async getTransfers(filter) {
