@@ -13,16 +13,15 @@ const handler = (router, routesContext) => {
 
     router.get('/transfers', async (ctx, next) => {
         const res = await routesContext.db.getTransfers(ctx.query);
-        if(res === null) {
+        if (res === null) {
             ctx.response.body = [];
-        }
-        else {
+        } else {
             ctx.response.body = res;
         }
         await next();
     });
 
-    router.get('/transferDetails/:transferId', async(ctx, next) => {
+    router.get('/transferDetails/:transferId', async (ctx, next) => {
         const res = await routesContext.db.getTransferAllDetails(ctx.params.transferId);
 
         if (res === null) {

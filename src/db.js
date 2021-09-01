@@ -4,8 +4,6 @@ const { sumAllParticipants, convertParticipantsAmountsToStrings } = require('./l
 const MYSQL_MIN_DATETIME = '1000-01-01';
 const MYSQL_MAX_DATETIME = '9999-12-31';
 
-const util = require('util');
-
 const previousSettlementWindowDataQuery = `
   SELECT id,
     MAX(payments) AS payments,
@@ -699,7 +697,7 @@ const transferAllDetailsQueries = {
             INNER JOIN transferState ON transferStateChange.transferStateId = transferState.transferStateId
         WHERE
             transferStateChange.transferId = ?
-        ORDER BY transferStateChange.transferStateChangeId`
+        ORDER BY transferStateChange.transferStateChangeId`,
 };
 
 module.exports = class Database {
@@ -763,7 +761,6 @@ module.exports = class Database {
         const [result] = await this.connection.query(findTransfersQuery, params);
         return result;
     }
-
 
     // TODO: in this query we get multiple results returned per (dfsp,currency). We should only
     // really get a single result per (dfsp,currency). This is happening because all historical
