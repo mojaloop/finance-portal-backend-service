@@ -521,6 +521,185 @@ GROUP BY settlementWindowId, accountCurrency
 ORDER BY settlementWindowId DESC
 `;
 
+const findTransfersQuery = `
+SELECT
+    qpPayer.fspid as payerFspid,
+    qpPayee.fspid as payeeFspid,
+    q.transactionReferenceId as transferId,
+    tS.name as transactionType,
+    q.createdDate as quoteTimestamp,
+    t.createdDate as transferTimestamp,
+    pITPayer.name as payerIdType,
+    qpPayer.partyIdentifierValue as payerIdValue,
+    pITPayee.name as payeeIdType,
+    qpPayee.partyIdentifierValue as payeeIdValue,
+    q.amount as amount,
+    c.currencyId as currency,
+    IFNULL(ts.enumeration, 'QUOTE ONLY') as state
+FROM
+    quote q
+    INNER JOIN quoteParty qpPayer on qpPayer.quoteId = q.quoteId AND qpPayer.partyTypeId = (SELECT partyTypeId FROM partyType WHERE name = 'PAYER')
+        INNER JOIN partyIdentifierType pITPayer ON pITPayer.partyIdentifierTypeId = qpPayer.partyIdentifierTypeId
+    INNER JOIN quoteParty qpPayee on qpPayee.quoteId = q.quoteId AND qpPayee.partyTypeId = (SELECT partyTypeId FROM partyType WHERE name = 'PAYEE')
+        INNER JOIN partyIdentifierType pITPayee ON pITPayee.partyIdentifierTypeId = qpPayee.partyIdentifierTypeId
+    INNER JOIN transactionScenario tS on tS.transactionScenarioId = q.transactionScenarioId
+    INNER JOIN currency c ON c.currencyId = q.currencyId
+
+    LEFT JOIN transfer t on t.transferId = q.transactionReferenceId
+    LEFT JOIN transferFulfilment tF on tF.transferId = t.transferId
+    LEFT JOIN (SELECT MAX(transferStateChangeId) as tscId, transferId FROM transferStateChange GROUP BY transferId ORDER BY transferId) tscid ON tscid.transferId = t.transferId
+    LEFT JOIN transferStateChange tsc ON tsc.transferStateChangeId = tscid.tscId
+    LEFT JOIN transferState ts ON ts.transferStateId = tsc.transferStateId
+    WHERE
+        transactionReferenceId LIKE ?
+        AND qpPayer.fspid LIKE ?
+        AND qpPayee.fspid LIKE ?
+        AND pITPayer.name LIKE ?
+        AND pITPayee.name LIKE ?
+        AND qpPayer.partyIdentifierValue LIKE ?
+        AND qpPayee.partyIdentifierValue LIKE ?
+        AND q.createdDate BETWEEN ? AND ?
+    LIMIT 1000
+`;
+
+const transferAllDetailsQueries = {
+    quoteRequests: `SELECT
+            q.quoteId as quoteId,
+            q.transactionReferenceId as transactionReferenceId,
+            q.transactionRequestId as transactionRequestId,
+            q.note as note,
+            q.expirationDate as expirationDate,
+            q.amount as amount,
+            q.createdDate as createdDate,
+            ti.name as transactionInitiator,
+            tit.name as transactionInitiatorType,
+            ts.name as transactionScenario,
+            tss.name as transactionSubScenario,
+            bop.name as balanceOfPaymentsType,
+            at.name as amountType,
+            q.currencyId as currency
+        FROM
+            quote q
+            INNER JOIN transactionInitiator ti on ti.transactionInitiatorId = q.transactionInitiatorId
+            INNER JOIN transactionInitiatorType tit on tit.transactionInitiatorTypeId = q.transactionInitiatorTypeId
+            INNER JOIN transactionScenario ts on ts.transactionScenarioId = q.transactionScenarioId
+            INNER JOIN amountType at on at.amountTypeId = q.amountTypeId
+
+            LEFT JOIN balanceOfPayments bop on bop.balanceOfPaymentsId = q.balanceOfPaymentsId
+            LEFT JOIN transactionSubScenario tss on tss.transactionSubScenarioId = q.transactionSubScenarioId
+        WHERE
+            q.transactionReferenceId = ?`,
+    quoteParties: `SELECT 
+            quoteParty.quoteId,
+            partyIdentifierType.name as partyIdentifierType,
+            quoteParty.partyIdentifierValue,
+            quoteParty.fspId,
+            quoteParty.merchantClassificationCode,
+            quoteParty.partyName,
+            transferParticipantRoleType.name as transferParticipantRoleType,
+            ledgerEntryType.name as ledgerEntryType,
+            quoteParty.amount,
+            quoteParty.currencyId,
+            quoteParty.createdDate,
+            quoteParty.partySubIdOrTypeId,
+            participant.name as participant
+        FROM
+            quoteParty
+            INNER JOIN partyIdentifierType ON quoteParty.partyIdentifierTypeId = partyIdentifierType.partyIdentifierTypeId
+            INNER JOIN transferParticipantRoleType ON quoteParty.transferParticipantRoleTypeId = transferParticipantRoleType.transferParticipantRoleTypeId
+            INNER JOIN ledgerEntryType ON quoteParty.ledgerEntryTypeId = ledgerEntryType.ledgerEntryTypeId
+            INNER JOIN participant ON quoteParty.participantId = participant.participantId
+            INNER JOIN quote ON quoteParty.quoteId = quote.quoteId
+        WHERE
+            quote.transactionReferenceId = ?`,
+    quoteResponses: `SELECT 
+            quote.quoteId,
+            quote.transactionReferenceId,
+            quoteResponse.quoteResponseId,
+            quoteResponse.transferAmountCurrencyId,
+            quoteResponse.transferAmount,
+            quoteResponse.payeeReceiveAmountCurrencyId,
+            quoteResponse.payeeReceiveAmount,
+            quoteResponse.payeeFspFeeCurrencyId,
+            quoteResponse.payeeFspFeeAmount,
+            quoteResponse.payeeFspCommissionCurrencyId,
+            quoteResponse.payeeFspCommissionAmount,
+            quoteResponse.ilpCondition,
+            quoteResponse.responseExpirationDate,
+            quoteResponse.isValid,
+            quoteResponse.createdDate,
+            quoteResponseIlpPacket.value as ilpPacket
+        FROM
+            quoteResponse
+            INNER JOIN quote ON quoteResponse.quoteId = quote.quoteId
+            INNER JOIN quoteResponseIlpPacket ON quoteResponseIlpPacket.quoteResponseId = quoteResponse.quoteResponseId
+        WHERE
+            quote.transactionReferenceId = ?`,
+    quoteErrors: `SELECT 
+            quoteError.quoteErrorId,
+            quoteError.quoteId,
+            quoteError.quoteResponseId,
+            quoteError.errorCode,
+            quoteError.errorDescription,
+            quoteError.createdDate,
+            quote.transactionReferenceId
+        FROM
+            quoteError
+            INNER JOIN quoteResponse ON quoteError.quoteResponseId = quoteResponse.quoteResponseId
+            INNER JOIN quote ON quoteError.quoteId = quote.quoteId
+        WHERE
+            quote.transactionReferenceId = ?`,
+    transferPrepares: `SELECT
+            transfer.transferId, 
+            transfer.amount, 
+            transfer.currencyId, 
+            transfer.ilpCondition, 
+            transfer.expirationDate, 
+            transfer.createdDate
+        FROM
+            transfer
+        WHERE
+            transfer.transferId = ?`,
+    transferFulfilments: `SELECT
+            transferFulfilment.transferId, 
+            transferFulfilment.ilpFulfilment, 
+            transferFulfilment.completedDate, 
+            transferFulfilment.isValid, 
+            transferFulfilment.settlementWindowId, 
+            transferFulfilment.createdDate
+        FROM
+            transferFulfilment
+        WHERE
+            transferFulfilment.transferId = ?`,
+    transferParticipants: `SELECT 
+            transferParticipant.transferParticipantId,
+            transferParticipant.transferId,
+            transferParticipant.participantCurrencyId,
+            transferParticipantRoleType.name as transferParticipantRoleType,
+            ledgerEntryType.name as ledgerEntryType,
+            transferParticipant.amount,
+            transferParticipant.createdDate
+        FROM
+            transferParticipant
+            INNER JOIN transferParticipantRoleType ON transferParticipant.transferParticipantRoleTypeId = transferParticipantRoleType.transferParticipantRoleTypeId
+            INNER JOIN ledgerEntryType ON transferParticipant.ledgerEntryTypeId = ledgerEntryType.ledgerEntryTypeId
+        WHERE
+            transferParticipant.transferId = ?`,
+    transferStateChanges: `SELECT
+            transferStateChange.transferStateChangeId, 
+            transferStateChange.transferId, 
+            transferState.enumeration,
+            transferState.description,
+            transferStateChange.reason, 
+            transferStateChange.createdDate
+        FROM
+            transferStateChange
+            INNER JOIN transferState ON transferStateChange.transferStateId = transferState.transferStateId
+        WHERE
+            transferStateChange.transferId = ?
+        ORDER BY transferStateChange.transferStateChangeId`,
+};
+
 module.exports = class Database {
     constructor(config) {
         this.connection = mysql.createPool({
@@ -532,6 +711,55 @@ module.exports = class Database {
 
         this.MYSQL_MAX_DATETIME = MYSQL_MAX_DATETIME;
         this.MYSQL_MIN_DATETIME = MYSQL_MIN_DATETIME;
+    }
+
+    async getTransferAllDetails(transferId) {
+        const [[quoteRequests],
+            [quoteParties],
+            [quoteResponses],
+            [quoteErrors],
+            [transferPrepares],
+            [transferFulfilments],
+            [transferParticipants],
+            [transferStateChanges]] = await Promise.all([
+            this.connection.query(transferAllDetailsQueries.quoteRequests, [transferId]),
+            this.connection.query(transferAllDetailsQueries.quoteParties, [transferId]),
+            this.connection.query(transferAllDetailsQueries.quoteResponses, [transferId]),
+            this.connection.query(transferAllDetailsQueries.quoteErrors, [transferId]),
+            this.connection.query(transferAllDetailsQueries.transferPrepares, [transferId]),
+            this.connection.query(transferAllDetailsQueries.transferFulfilments, [transferId]),
+            this.connection.query(transferAllDetailsQueries.transferParticipants, [transferId]),
+            this.connection.query(transferAllDetailsQueries.transferStateChanges, [transferId]),
+        ]);
+
+        return {
+            transferId,
+            quoteRequests,
+            quoteParties,
+            quoteResponses,
+            quoteErrors,
+            transferPrepares,
+            transferFulfilments,
+            transferParticipants,
+            transferStateChanges,
+        };
+    }
+
+    async getTransfers(filter) {
+        const params = [
+            `%${filter.transferId ? filter.transferId : ''}%`,
+            `%${filter.payerFspid ? filter.payerFspid : ''}%`,
+            `%${filter.payeeFspid ? filter.payeeFspid : ''}%`,
+            `%${filter.payerIdType ? filter.payerIdType : ''}%`,
+            `%${filter.payeeIdType ? filter.payeeIdType : ''}%`,
+            `%${filter.payerIdValue ? filter.payerIdValue : ''}%`,
+            `%${filter.payeeIdValue ? filter.payeeIdValue : ''}%`,
+            filter.from ? new Date(filter.from) : new Date(0),
+            filter.to ? new Date(filter.to) : new Date(),
+        ];
+
+        const [result] = await this.connection.query(findTransfersQuery, params);
+        return result;
     }
 
     // TODO: in this query we get multiple results returned per (dfsp,currency). We should only
