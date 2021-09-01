@@ -1,0 +1,11 @@
+{
+  "decisions": {
+    "1766|koa-router>urijs": {
+      "decision": "ignore",
+      "madeAt": 1629913783094,
+      "expiresAt": 1632505770870
+    }
+  },
+  "rules": {},
+  "version": 1
+}
