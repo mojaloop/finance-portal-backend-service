@@ -113,7 +113,7 @@ const createServer = (config, db, log, Database) => {
             return;
         }
 
-        const token = getTokenCookieFromRequest(ctx.request);
+        const token = getTokenCookieFromRequest(ctx);
 
         if (!token) {
             ctx.response.status = 401;
