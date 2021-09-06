@@ -1,6 +1,6 @@
 const Big = require('big.js');
 const {
-    getSettlementAccountId, bigifyPaymentMatrix, getPayees, getPayers, getParticipantName,
+    getSettlementAccountId, getPayees, getPayers, getParticipantName,
     newParticipantsAccountStateAndReason, getAllParticipantNames, segmentParticipants,
     getParticipantAccounts,
 } = require('../../../lib/handlerHelpers');
@@ -263,14 +263,6 @@ describe('Handler Helpers', () => {
                 },
             ];
             const actual = getPayers(participants);
-            expect(actual).toEqual(expected);
-        });
-    });
-    describe('bigifyPaymentMatrix', () => {
-        it('should correctly return a copy of the payment matrix with Big.js typed amounts', () => {
-            const paymentMatrix = [['XOF', '17', '-1'], ['XOF', '18', '1']];
-            const expected = [['XOF', '17', Big('-1')], ['XOF', '18', Big('1')]];
-            const actual = bigifyPaymentMatrix(paymentMatrix);
             expect(actual).toEqual(expected);
         });
     });

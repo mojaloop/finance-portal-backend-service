@@ -187,9 +187,6 @@ const processPaymentsMatrixAndGetFailedPayments = async (paymentMatrix, dfsps, p
     return failedPayments;
 };
 
-const bigifyPaymentMatrix = (paymentMatrix, createBigNum = Big) => paymentMatrix
-    .map(([currency, participantId, amount]) => ([currency, participantId, createBigNum(amount)]));
-
 const segmentParticipants = (participants) => {
     const payers = getPayers(participants);
     const payees = getPayees(participants);
@@ -205,7 +202,6 @@ const segmentParticipants = (participants) => {
 };
 
 module.exports = {
-    bigifyPaymentMatrix,
     getAllParticipantNames,
     getParticipantAccounts,
     getParticipantName,
