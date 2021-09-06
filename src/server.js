@@ -75,6 +75,7 @@ const createServer = (config, db, log, Database) => {
                 await db.dummyQuery();
                 ctx.response.status = 204;
             } catch (err) {
+                ctx.log.child({ err }).error('Database dummy query failed');
                 ctx.response.status = 500;
             }
             return;
