@@ -3,6 +3,27 @@ const casaLib = require('@mojaloop/finance-portal-lib');
 
 const { participantFundsOutPrepareReserve, participantFundsInReserve } = casaLib.admin.api;
 
+const constants = {
+    TOKEN_COOKIE_NAME: 'mojaloop-portal-token',
+};
+
+// The cookie _should_ look like:
+//   mojaloop-portal-token=abcde
+// But when doing local development, the cookie may look like:
+//   some-rubbish=whatever; mojaloop-portal-token=abcde; other-rubbish=defgh
+// because of other cookies set on the host. So we take some more care extracting it here.
+const getTokenCookieFromRequest = (request) => request
+    // get the cookie header string, it'll look like
+    // some-rubbish=whatever; token=abcde; other-crap=defgh
+    .get('Cookie')
+    // Split it so we have some key-value pairs that look like
+    // [['some-rubbish', 'whatever'], ['token', 'abcde'], ['other-rubbish', 'defgh']]
+    ?.split(';')
+    ?.map((cookie) => cookie.trim().split('='))
+    // Find the token cookie and get its value
+    // We assume there's only one instance of our cookie
+    ?.find(([name]) => name === constants.TOKEN_COOKIE_NAME)?.[1];
+
 const getSettlementWindows = async (routesContext, fromDateTime, toDateTime,
     settlementWindowId) => {
     const result = await routesContext.db.getSettlementWindows({ fromDateTime, toDateTime });
@@ -184,15 +205,16 @@ const segmentParticipants = (participants) => {
 };
 
 module.exports = {
-    getSettlementWindows,
-    getSettlementAccountId,
     bigifyPaymentMatrix,
+    getAllParticipantNames,
+    getParticipantAccounts,
+    getParticipantName,
     getPayees,
     getPayers,
-    getParticipantName,
+    getSettlementAccountId,
+    getSettlementWindows,
+    getTokenCookieFromRequest,
     newParticipantsAccountStateAndReason,
-    getAllParticipantNames,
-    segmentParticipants,
-    getParticipantAccounts,
     processPaymentsMatrixAndGetFailedPayments,
+    segmentParticipants,
 };
