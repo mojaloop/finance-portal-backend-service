@@ -1,6 +1,7 @@
 const fetch = require('node-fetch');
 const https = require('https');
 const qs = require('querystring');
+const { buildUserInfoResponse } = require('../lib/handlerHelpers');
 
 // Create an https agent for use with self-signed certificates
 // TODO: do we need this? It's used when contacting wso2. Does wso2 have a self-signed cert?
@@ -8,6 +9,7 @@ const selfSignedAgent = new https.Agent({ rejectUnauthorized: false });
 
 const handler = (router, routesContext) => {
     // TODO: set the Max-Age directive corresponding to the token expiry time.
+    // Expiry time is available on the oauth2Token.expires_in property
     const cookieDirectives = (cookieName, token, insecure) => (
         insecure
             ? `${cookieName}=${token}; Path=/`
@@ -39,9 +41,7 @@ const handler = (router, routesContext) => {
             return;
         }
 
-        ctx.response.body = {
-            expiresIn: oauth2Token.expires_in,
-        };
+        ctx.response.body = buildUserInfoResponse(oauth2Token.access_token);
         ctx.response.set({
             'Set-Cookie': cookieDirectives(
                 ctx.constants.TOKEN_COOKIE_NAME,

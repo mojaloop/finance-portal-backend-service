@@ -1,3 +1,5 @@
+const jwt = require('jsonwebtoken');
+
 // The cookie _should_ look like:
 //   mojaloop-portal-token=abcde
 // But when doing local development, the cookie may look like:
@@ -14,6 +16,13 @@ const getTokenCookieFromRequest = (ctx) => ctx.request
     // Find the token cookie and get its value
     // We assume there's only one instance of our cookie
     ?.find(([name]) => name === ctx.constants.TOKEN_COOKIE_NAME)?.[1];
+
+// This function is shared to ensure /login and /userinfo return the same result
+const buildUserInfoResponse = (encodedJwtToken) => {
+    const token = jwt.decode(encodedJwtToken);
+    const username = token.sub.split('@')[0];
+    return { username };
+};
 
 const getSettlementWindows = async (routesContext, fromDateTime, toDateTime,
     settlementWindowId) => {
@@ -70,6 +79,7 @@ const getSettlementWindows = async (routesContext, fromDateTime, toDateTime,
 };
 
 module.exports = {
+    buildUserInfoResponse,
     getSettlementWindows,
     getTokenCookieFromRequest,
 };
