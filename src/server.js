@@ -21,6 +21,10 @@ const selfSignedAgent = new https.Agent({ rejectUnauthorized: false });
 const createServer = (config, db, log, Database) => {
     const app = new Koa();
 
+    app.context.constants = {
+        TOKEN_COOKIE_NAME: 'mojaloop-portal-token',
+    };
+
     //
     // Pre-route-handler middleware
     //
@@ -179,7 +183,6 @@ const createServer = (config, db, log, Database) => {
                 config,
                 db,
                 Database,
-                constants,
             }]);
         });
 

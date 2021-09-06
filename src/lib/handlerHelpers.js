@@ -1,13 +1,9 @@
-const constants = {
-    TOKEN_COOKIE_NAME: 'mojaloop-portal-token',
-};
-
 // The cookie _should_ look like:
 //   mojaloop-portal-token=abcde
 // But when doing local development, the cookie may look like:
 //   some-rubbish=whatever; mojaloop-portal-token=abcde; other-rubbish=defgh
 // because of other cookies set on the host. So we take some more care extracting it here.
-const getTokenCookieFromRequest = (request) => request
+const getTokenCookieFromRequest = (ctx) => ctx.request
     // get the cookie header string, it'll look like
     // some-rubbish=whatever; token=abcde; other-crap=defgh
     .get('Cookie')
@@ -17,7 +13,7 @@ const getTokenCookieFromRequest = (request) => request
     ?.map((cookie) => cookie.trim().split('='))
     // Find the token cookie and get its value
     // We assume there's only one instance of our cookie
-    ?.find(([name]) => name === constants.TOKEN_COOKIE_NAME)?.[1];
+    ?.find(([name]) => name === ctx.constants.TOKEN_COOKIE_NAME)?.[1];
 
 const getSettlementWindows = async (routesContext, fromDateTime, toDateTime,
     settlementWindowId) => {
