@@ -8,8 +8,6 @@ const { buildUserInfoResponse } = require('../lib/handlerHelpers');
 const selfSignedAgent = new https.Agent({ rejectUnauthorized: false });
 
 const handler = (router, routesContext) => {
-    // TODO: set the Max-Age directive corresponding to the token expiry time.
-    // Expiry time is available on the oauth2Token.expires_in property
     const cookieDirectives = (cookieName, token, insecure) => (
         insecure
             ? `${cookieName}=${token}; Path=/`
