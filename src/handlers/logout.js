@@ -24,7 +24,7 @@ const handler = (router, routesContext) => {
         };
         await fetch(routesContext.config.auth.revokeEndpoint, opts);
         ctx.response.set({
-            'Set-Cookie': `${routesContext.constants.TOKEN_COOKIE_NAME}=deleted; expires=Thu, 01 Jan 1970 00:00:00 GMT;HttpOnly; SameSite=strict${routesContext.config.insecureCookie ? '' : '; Secure'}`,
+            'Set-Cookie': `${ctx.constants.TOKEN_COOKIE_NAME}=deleted; Path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;HttpOnly; SameSite=strict${routesContext.config.insecureCookie ? '' : '; Secure'}`,
         });
         ctx.response.body = {
             status: 'Ok',

@@ -1,7 +1,28 @@
-const Big = require('big.js');
-const casaLib = require('@mojaloop/finance-portal-lib');
+const jwt = require('jsonwebtoken');
 
-const { participantFundsOutPrepareReserve, participantFundsInReserve } = casaLib.admin.api;
+// The cookie _should_ look like:
+//   mojaloop-portal-token=abcde
+// But when doing local development, the cookie may look like:
+//   some-rubbish=whatever; mojaloop-portal-token=abcde; other-rubbish=defgh
+// because of other cookies set on the host. So we take some more care extracting it here.
+const getTokenCookieFromRequest = (ctx) => ctx.request
+    // get the cookie header string, it'll look like
+    // some-rubbish=whatever; token=abcde; other-crap=defgh
+    .get('Cookie')
+    // Split it so we have some key-value pairs that look like
+    // [['some-rubbish', 'whatever'], ['token', 'abcde'], ['other-rubbish', 'defgh']]
+    ?.split(';')
+    ?.map((cookie) => cookie.trim().split('='))
+    // Find the token cookie and get its value
+    // We assume there's only one instance of our cookie
+    ?.find(([name]) => name === ctx.constants.TOKEN_COOKIE_NAME)?.[1];
+
+// This function is shared to ensure /login and /userinfo return the same result
+const buildUserInfoResponse = (encodedJwtToken) => {
+    const token = jwt.decode(encodedJwtToken);
+    const username = token.sub.split('@')[0];
+    return { username };
+};
 
 const getSettlementWindows = async (routesContext, fromDateTime, toDateTime,
     settlementWindowId) => {
@@ -57,142 +78,8 @@ const getSettlementWindows = async (routesContext, fromDateTime, toDateTime,
     return settlementWindows;
 };
 
-const filterParticipants = (participants, filter) => participants
-    .filter((participant) => participant.accounts
-        .findIndex((account) => filter(account.netSettlementAmount.amount)) !== -1)
-    .map((participant) => ({
-        ...participant,
-        accounts: participant.accounts
-            .filter((account) => filter(account.netSettlementAmount.amount)),
-    }));
-
-// Payers' settlement amounts will be positive while payees' will be negative
-const getPayers = (participants) => filterParticipants(participants, (x) => x > 0);
-const getPayees = (participants) => filterParticipants(participants, (x) => x < 0);
-
-const newParticipantsAccountStateAndReason = (participants, reason, state) => participants
-    .map((participant) => ({
-        ...participant,
-        accounts: participant.accounts.map((account) => ({ id: account.id, reason, state })),
-    }));
-
-const getParticipantName = (dfsps, participants, participantId) => {
-    const accountIds = participants.find((participant) => String(participant.id) === participantId)
-        .accounts.map((account) => String(account.id));
-    const participant = dfsps.find((dfsp) => {
-        const dfspAccountIds = dfsp.accounts.map((account) => String(account.id));
-        const accountPresent = dfspAccountIds
-            .some((accountId) => accountIds.includes(accountId));
-        return accountPresent;
-    });
-    try {
-        const { name } = participant;
-        return name;
-    } catch (error) {
-        throw new Error('Could not find participant\'s name via its account from list of DFSP\'s');
-    }
-};
-
-const getAllParticipantNames = (dfsps, participants, paymentMatrix) => paymentMatrix
-    .map((payment) => {
-        const [, participantId] = payment;
-        const participantName = getParticipantName(dfsps, participants, participantId);
-        return participantName;
-    });
-
-const getSettlementAccountId = (accounts, currency) => accounts
-    .find((account) => account.isActive === 1
-        && account.ledgerAccountType === 'SETTLEMENT'
-        && account.currency === currency)
-    .id;
-
-const getParticipantAccounts = (dfsps, participantName) => {
-    try {
-        const participantDfsp = dfsps.find((dfsp) => {
-            const { name } = dfsp;
-            const equal = name === participantName;
-            return equal;
-        });
-        const { accounts } = participantDfsp;
-        return accounts;
-    } catch (error) {
-        throw new Error('Could not find participant\'s accounts via its name from list of DFSP\'s');
-    }
-};
-
-const processPaymentAndReturnFailedPayment = async (payment, dfsps, participants,
-    centralLedgerEndpoint, log) => {
-    try {
-        const [currency, participantId, amount] = payment;
-        const participantName = getParticipantName(dfsps, participants, participantId);
-        const accounts = getParticipantAccounts(dfsps, participantName);
-        const accountId = getSettlementAccountId(accounts, currency);
-        if (amount < 0) { // Funds Out
-            await participantFundsOutPrepareReserve(
-                centralLedgerEndpoint,
-                participantName,
-                accountId,
-                Math.abs(amount), // we need to send positive amount
-                currency,
-                'Admin portal funds out request',
-                log,
-            );
-        } else { // Funds In
-            await participantFundsInReserve(
-                centralLedgerEndpoint,
-                participantName,
-                accountId,
-                Math.abs(amount),
-                'Admin portal funds in request',
-                currency,
-                log,
-            );
-        }
-    } catch (error) {
-        log(`Error while processing the funds: ${error}`);
-        return payment;
-    }
-    return null;
-};
-
-const processPaymentsMatrixAndGetFailedPayments = async (paymentMatrix, dfsps, participants,
-    centralLedgerEndpoint, log) => {
-    const paymentProcessingResults = await Promise.all(paymentMatrix.map(
-        async (unprocessedPayment) => processPaymentAndReturnFailedPayment(
-            unprocessedPayment, dfsps, participants, centralLedgerEndpoint, log,
-        ),
-    ));
-    const failedPayments = paymentProcessingResults.filter((result) => result !== null);
-    return failedPayments;
-};
-
-const bigifyPaymentMatrix = (paymentMatrix, createBigNum = Big) => paymentMatrix
-    .map(([currency, participantId, amount]) => ([currency, participantId, createBigNum(amount)]));
-
-const segmentParticipants = (participants) => {
-    const payers = getPayers(participants);
-    const payees = getPayees(participants);
-
-    const payerParticipants = newParticipantsAccountStateAndReason(payers,
-        'Payer: SETTLED, settlement: SETTLED', 'SETTLED');
-    const payeeParticipants = newParticipantsAccountStateAndReason(payees,
-        'Payee: SETTLED, settlement: SETTLED', 'SETTLED');
-    const allParticipants = newParticipantsAccountStateAndReason(participants,
-        'All Participants: SETTLED, settlement: SETTLED', 'SETTLED');
-
-    return { payerParticipants, payeeParticipants, allParticipants };
-};
-
 module.exports = {
+    buildUserInfoResponse,
     getSettlementWindows,
-    getSettlementAccountId,
-    bigifyPaymentMatrix,
-    getPayees,
-    getPayers,
-    getParticipantName,
-    newParticipantsAccountStateAndReason,
-    getAllParticipantNames,
-    segmentParticipants,
-    getParticipantAccounts,
-    processPaymentsMatrixAndGetFailedPayments,
+    getTokenCookieFromRequest,
 };

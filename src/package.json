@@ -1,6 +1,6 @@
 {
   "name": "@mojaloop/finance-portal-backend-service",
-  "version": "15.2.2",
+  "version": "15.3.0",
   "description": "The backend service to support the finance portal web ui. Essentially a thin wrapper around SQL queries.",
   "license": "Apache-2.0",
   "contributors": [
@@ -23,7 +23,6 @@
     "@mojaloop/sdk-standard-components": "15.12.0",
     "axios": "0.21.1",
     "base64url": "3.0.1",
-    "big.js": "5.2.2",
     "dotenv": "6.2.0",
     "glob": "7.1.4",
     "json-2-csv": "^3.14.4",
@@ -41,6 +40,7 @@
     "sleep-promise": "8.0.1"
   },
   "devDependencies": {
+    "chance": "^1.1.8",
     "eslint": "^7.32.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.24.2",

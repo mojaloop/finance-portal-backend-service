@@ -6,6 +6,7 @@ const https = require('https');
 const Router = require('koa-router');
 const { randomPhrase } = require('@mojaloop/sdk-standard-components');
 const { permit } = require('./lib/permissions');
+const { getTokenCookieFromRequest } = require('./lib/handlerHelpers');
 
 // TODO:
 // - reject content types that are not application/json (this comes back to validation)
@@ -14,15 +15,15 @@ const { permit } = require('./lib/permissions');
 // TODO: do we need this? It's used when contacting wso2. Does wso2 have a self-signed cert?
 const selfSignedAgent = new https.Agent({ rejectUnauthorized: false });
 
-const constants = {
-    TOKEN_COOKIE_NAME: 'mojaloop-portal-token',
-};
-
 //
 // Server
 //
 const createServer = (config, db, log, Database) => {
     const app = new Koa();
+
+    app.context.constants = {
+        TOKEN_COOKIE_NAME: 'mojaloop-portal-token',
+    };
 
     //
     // Pre-route-handler middleware
@@ -74,6 +75,7 @@ const createServer = (config, db, log, Database) => {
                 await db.dummyQuery();
                 ctx.response.status = 204;
             } catch (err) {
+                ctx.log.child({ err }).error('Database dummy query failed');
                 ctx.response.status = 500;
             }
             return;
@@ -111,22 +113,7 @@ const createServer = (config, db, log, Database) => {
             return;
         }
 
-        // The cookie _should_ look like:
-        //   mojaloop-portal-token=abcde
-        // But when doing local development, the cookie may look like:
-        //   some-rubbish=whatever; mojaloop-portal-token=abcde; other-rubbish=defgh
-        // because of other cookies set on the host. So we take some more care extracting it here.
-        const token = ctx.request
-            // get the cookie header string, it'll look like
-            // some-rubbish=whatever; token=abcde; other-crap=defgh
-            .get('Cookie')
-            // Split it so we have some key-value pairs that look like
-            // [['some-rubbish', 'whatever'], ['token', 'abcde'], ['other-rubbish', 'defgh']]
-            ?.split(';')
-            ?.map((cookie) => cookie.trim().split('='))
-            // Find the token cookie and get its value
-            // We assume there's only one instance of our cookie
-            ?.find(([name]) => name === constants.TOKEN_COOKIE_NAME)?.[1];
+        const token = getTokenCookieFromRequest(ctx);
 
         if (!token) {
             ctx.response.status = 401;
@@ -197,7 +184,6 @@ const createServer = (config, db, log, Database) => {
                 config,
                 db,
                 Database,
-                constants,
             }]);
         });
 
