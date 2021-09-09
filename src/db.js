@@ -523,44 +523,54 @@ ORDER BY settlementWindowId DESC
 
 const findTransfersQuery = `
 SELECT
-    qpPayer.fspid as payerFspid,
-    qpPayee.fspid as payeeFspid,
-    q.transactionReferenceId as transferId,
+    tpPayer.name as payerFspid,
+    tpPayee.name as payeeFspid,
+    t.transferId as transferId,
     tS.name as transactionType,
     q.createdDate as quoteTimestamp,
     t.createdDate as transferTimestamp,
-    pITPayer.name as payerIdType,
-    qpPayer.partyIdentifierValue as payerIdValue,
-    pITPayee.name as payeeIdType,
-    qpPayee.partyIdentifierValue as payeeIdValue,
-    q.amount as amount,
+    pITPayer.name as payerIdentifierType,
+    qpPayer.partyIdentifierValue as payerIdentifierValue,
+    pITPayee.name as payeeIdentifierType,
+    qpPayee.partyIdentifierValue as payeeIdentifierValue,
+    t.amount as amount,
     c.currencyId as currency,
-    IFNULL(ts.enumeration, 'QUOTE ONLY') as state
+    ts.enumeration as state
 FROM
-    quote q
-    INNER JOIN quoteParty qpPayer on qpPayer.quoteId = q.quoteId AND qpPayer.partyTypeId = (SELECT partyTypeId FROM partyType WHERE name = 'PAYER')
-        INNER JOIN partyIdentifierType pITPayer ON pITPayer.partyIdentifierTypeId = qpPayer.partyIdentifierTypeId
-    INNER JOIN quoteParty qpPayee on qpPayee.quoteId = q.quoteId AND qpPayee.partyTypeId = (SELECT partyTypeId FROM partyType WHERE name = 'PAYEE')
-        INNER JOIN partyIdentifierType pITPayee ON pITPayee.partyIdentifierTypeId = qpPayee.partyIdentifierTypeId
-    INNER JOIN transactionScenario tS on tS.transactionScenarioId = q.transactionScenarioId
-    INNER JOIN currency c ON c.currencyId = q.currencyId
-
-    LEFT JOIN transfer t on t.transferId = q.transactionReferenceId
+    transfer t
+    LEFT JOIN (SELECT
+        participant.name, 
+        transferParticipant.transferId
+    FROM
+        transferParticipant
+        INNER JOIN participantCurrency ON transferParticipant.participantCurrencyId = participantCurrency.participantCurrencyId
+        INNER JOIN participant ON participantCurrency.participantId = participant.participantId
+        INNER JOIN transferParticipantRoleType ON transferParticipant.transferParticipantRoleTypeId = transferParticipantRoleType.transferParticipantRoleTypeId
+    WHERE
+        transferParticipantRoleType.name = 'PAYER_DFSP') tpPayer ON tpPayer.transferId = t.transferId
+    LEFT JOIN (SELECT
+        participant.name, 
+        transferParticipant.transferId
+    FROM
+        transferParticipant
+        INNER JOIN participantCurrency ON transferParticipant.participantCurrencyId = participantCurrency.participantCurrencyId
+        INNER JOIN participant ON participantCurrency.participantId = participant.participantId
+        INNER JOIN transferParticipantRoleType ON transferParticipant.transferParticipantRoleTypeId = transferParticipantRoleType.transferParticipantRoleTypeId
+    WHERE
+        transferParticipantRoleType.name = 'PAYEE_DFSP') tpPayee ON tpPayee.transferId = t.transferId
+    
     LEFT JOIN transferFulfilment tF on tF.transferId = t.transferId
     LEFT JOIN (SELECT MAX(transferStateChangeId) as tscId, transferId FROM transferStateChange GROUP BY transferId ORDER BY transferId) tscid ON tscid.transferId = t.transferId
     LEFT JOIN transferStateChange tsc ON tsc.transferStateChangeId = tscid.tscId
     LEFT JOIN transferState ts ON ts.transferStateId = tsc.transferStateId
-    WHERE
-        transactionReferenceId LIKE ?
-        AND qpPayer.fspid LIKE ?
-        AND qpPayee.fspid LIKE ?
-        AND pITPayer.name LIKE ?
-        AND pITPayee.name LIKE ?
-        AND qpPayer.partyIdentifierValue LIKE ?
-        AND qpPayee.partyIdentifierValue LIKE ?
-        AND q.createdDate BETWEEN ? AND ?
-    LIMIT 1000
-`;
+    
+    LEFT JOIN quote q on t.transferId = q.transactionReferenceId
+    LEFT JOIN quoteParty qpPayer on qpPayer.quoteId = q.quoteId AND qpPayer.partyTypeId = (SELECT partyTypeId FROM partyType WHERE name = 'PAYER')
+        LEFT JOIN partyIdentifierType pITPayer ON pITPayer.partyIdentifierTypeId = qpPayer.partyIdentifierTypeId
+    LEFT JOIN quoteParty qpPayee on qpPayee.quoteId = q.quoteId AND qpPayee.partyTypeId = (SELECT partyTypeId FROM partyType WHERE name = 'PAYEE')
+        LEFT JOIN partyIdentifierType pITPayee ON pITPayee.partyIdentifierTypeId = qpPayee.partyIdentifierTypeId
+    LEFT JOIN transactionScenario tS on tS.transactionScenarioId = q.transactionScenarioId
+    LEFT JOIN currency c ON c.currencyId = t.currencyId`;
 
 const transferAllDetailsQueries = {
     quoteRequests: `SELECT
@@ -746,17 +756,45 @@ module.exports = class Database {
     }
 
     async getTransfers(filter) {
-        const params = [
-            `%${filter.transferId ? filter.transferId : ''}%`,
-            `%${filter.payerFspid ? filter.payerFspid : ''}%`,
-            `%${filter.payeeFspid ? filter.payeeFspid : ''}%`,
-            `%${filter.payerIdType ? filter.payerIdType : ''}%`,
-            `%${filter.payeeIdType ? filter.payeeIdType : ''}%`,
-            `%${filter.payerIdValue ? filter.payerIdValue : ''}%`,
-            `%${filter.payeeIdValue ? filter.payeeIdValue : ''}%`,
-            filter.from ? new Date(filter.from) : new Date(0),
-            filter.to ? new Date(filter.to) : new Date(),
+        let whereClause = '';
+        let params = [];
+
+        const filterArgs = [
+            { type: 'string', arg: 'transferId', field: 't.transferId' },
+            { type: 'string', arg: 'payerFspid', field: 'tpPayer.name' },
+            { type: 'string', arg: 'payeeFspid', field: 'tpPayee.name' },
+            { type: 'string', arg: 'payerIdType', field: 'pITPayer.name' },
+            { type: 'string', arg: 'payeeIdType', field: 'pITPayee.name' },
+            { type: 'string', arg: 'payerIdValue', field: 'qpPayer.partyIdentifierValue' },
+            { type: 'string', arg: 'payeeIdValue', field: 'qpPayee.partyIdentifierValue' },
+            { type: 'date', arg: 'from', field: 't.createdDate', op: '>=' },
+            { type: 'date', arg: 'to', field: 't.createdDate', op: '<=' },
         ];
+
+        filterArgs.forEach(a => {
+            if(filter[a.arg] && filter[a.arg] !== 'undefined') {
+                if(whereClause.length > 0) {
+                    whereClause = whereClause += ' AND ';
+                }
+
+                switch(a.type) {
+                    case 'string':
+                        whereClause += `${a.field} LIKE ?`;
+                        params.push(filter[a.arg]);
+                        break;
+
+                    case 'date':
+                        whereClause += `${a.field} ${a.op} ?`;
+                        params.push(new Date(filter[a.arg]));
+                        break;
+
+                    default:
+                        throw new Error(`Unhandled filter arg type: ${a.type}`);
+                }
+            }
+        });
+
+        whereClause += ' LIMIT 1000';
 
         const [result] = await this.connection.query(findTransfersQuery, params);
         return result;
