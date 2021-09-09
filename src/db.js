@@ -757,7 +757,7 @@ module.exports = class Database {
 
     async getTransfers(filter) {
         let whereClause = '';
-        let params = [];
+        const params = [];
 
         const filterArgs = [
             { type: 'string', arg: 'transferId', field: 't.transferId' },
@@ -767,17 +767,23 @@ module.exports = class Database {
             { type: 'string', arg: 'payeeIdType', field: 'pITPayee.name' },
             { type: 'string', arg: 'payerIdValue', field: 'qpPayer.partyIdentifierValue' },
             { type: 'string', arg: 'payeeIdValue', field: 'qpPayee.partyIdentifierValue' },
-            { type: 'date', arg: 'from', field: 't.createdDate', op: '>=' },
-            { type: 'date', arg: 'to', field: 't.createdDate', op: '<=' },
+            {
+                type: 'date', arg: 'from', field: 't.createdDate', op: '>=',
+            },
+            {
+                type: 'date', arg: 'to', field: 't.createdDate', op: '<=',
+            },
         ];
 
-        filterArgs.forEach(a => {
-            if(filter[a.arg] && filter[a.arg] !== 'undefined') {
-                if(whereClause.length > 0) {
+        /* eslint-disable no-multi-assign */
+
+        filterArgs.forEach((a) => {
+            if (filter[a.arg] && filter[a.arg] !== 'undefined') {
+                if (whereClause.length > 0) {
                     whereClause = whereClause += ' AND ';
                 }
 
-                switch(a.type) {
+                switch (a.type) {
                     case 'string':
                         whereClause += `${a.field} LIKE ?`;
                         params.push(filter[a.arg]);
@@ -795,6 +801,8 @@ module.exports = class Database {
         });
 
         whereClause += ' LIMIT 1000';
+
+        /* eslint-enable no-multi-assign */
 
         const [result] = await this.connection.query(findTransfersQuery, params);
         return result;
