@@ -802,8 +802,6 @@ module.exports = class Database {
 
         const q = `${findTransfersQuery}${whereClause.length ? ' WHERE' : ''} ${whereClause} LIMIT 1000`;
 
-        console.log(`##### ${q}`);
-
         /* eslint-enable no-multi-assign */
 
         const [result] = await this.connection.query(q, params);
