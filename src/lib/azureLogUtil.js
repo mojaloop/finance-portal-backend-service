@@ -72,7 +72,7 @@ const getTransferMessageWithJWSSignature = async (config, transferId, log) => {
 
     const messagePattern = new RegExp(config.kafkaMessagePattern);
     const match = data.match(messagePattern);
-    let cleanMessage = match[1];
+    let cleanMessage = (Array.isArray(match) && match.length > 0)  && match[1];
 
     if (!cleanMessage) {
         return null;
