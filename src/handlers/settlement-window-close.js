@@ -31,7 +31,6 @@ const handler = (router, routesContext) => {
                 );
             }
         } else { // use the default OSS settlement service
-
             const resp = await axios.post(
                 `${routesContext.config.centralSettlementsEndpoint}/settlementWindows/${ctx.params.settlementWindowId}`,
                 {
@@ -42,9 +41,9 @@ const handler = (router, routesContext) => {
                     validateStatus: null,
                 },
             );
-    
+
             ctx.response.status = resp.status;
-    
+
             if (resp.status === 200) {
                 await sleep(3000);
                 ctx.response.body = await handlerHelpers.getSettlementWindows(
