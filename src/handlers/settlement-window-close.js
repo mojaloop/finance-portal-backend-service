@@ -10,7 +10,7 @@ const handler = (router, routesContext) => {
         // if an external settlement service is provided use that
         if (routesContext.config.externalSettlementsEndpoint) {
             try {
-                const resp = await axios.post(`${routesContext.config.externalSettlementsEndpoint}`, {});
+                const resp = await axios.post(`${routesContext.config.externalSettlementsEndpoint}/settlement-windows/current/close`, {});
                 if (resp.status === 202) {
                     ctx.response.status = 200;
                 } else {
