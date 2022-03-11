@@ -14,7 +14,7 @@ const permit = async (userInfoURL, token, requestMethod, requestPath, log) => {
         agent: selfSignedAgent,
     };
     const userinfo = await fetch(userInfoURL, opts).then((res) => res.json());
-    log.info('Got userinfo:', userinfo);
+    log.info(`Got userinfo: ${userinfo}`);
 
     const usergroups = userinfo.groups ? userinfo.groups.split(',') : [];
     if (requestPath.includes('netdebitcap') && requestMethod === 'POST') {
