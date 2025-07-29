@@ -27,7 +27,7 @@
     "glob": "7.1.4",
     "json-2-csv": "^3.15.1",
     "jsonwebtoken": "8.5.1",
-    "koa": "2.7.0",
+    "koa": "3.0.1",
     "koa-body": "4.1.0",
     "koa-router": "7.4.0",
     "koa-send": "5.0.0",
