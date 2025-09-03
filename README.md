@@ -1,6 +1,7 @@
-#[DEPRECATED] finance-portal-backend-service
-Deprecation Notice
-Theis repo is deprecated as of September 2025. It is no longer maintained, and is no longer referenced by any releases of Mojaloop.
+# [DEPRECATED] finance-portal-backend-service
+Deprecation Notice:
+
+This repo is deprecated as of September 2025. It is no longer maintained, and is no longer referenced by any releases of Mojaloop.
 
 For general mojaloop documentation, please refer to [Mojaloop documentation](https://docs.mojaloop.io) .
 
